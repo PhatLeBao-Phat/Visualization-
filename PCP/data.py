@@ -30,6 +30,7 @@ def test_data(df):
     "generate test sample"
     df_plot = df.dropna(inplace=False)
     df_plot = df_plot.iloc[1:1000, :]
+    df_plot = df_plot.reset_index(drop=True)
 
     return df_plot
 

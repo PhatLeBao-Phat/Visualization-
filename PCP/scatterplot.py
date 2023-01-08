@@ -11,57 +11,44 @@ customdata = list(
         )
 )
 
-fig_scatter = go.Figure()
+def make_scatter(feature, color_by, title):
+    fig_scatter = go.Figure()
 
-fig_scatter.add_trace(
-    go.Scatter(
-        x=df_plot['review_scores_accuracy'],
-        y=df_plot['review_scores_checkin'],
-        mode='markers',
-        marker_color=df_plot['bedrooms'],
-        customdata=customdata,
+    fig_scatter.add_trace(
+        go.Scatter(
+            x=df_plot[feature[0]],
+            y=df_plot[feature[1]],
+            mode='markers',
+            marker_color=df_plot[color_by],
+            customdata=customdata,
+        )
     )
-)
 
-fig_scatter.update_layout(
-    plot_bgcolor='white',
-    paper_bgcolor='white',
-    xaxis_title='review_scores_accuracy',
-    yaxis_title='review_scores_checkin',
-    title_text='Scatter Plot 1',
-    title_x=0.5,
-    yaxis_zeroline=False,
-    xaxis_zeroline=False,
-    dragmode='select',
-)
-
-fig_scatter.update_xaxes(showgrid=True, gridwidth=1, gridcolor='grey')
-fig_scatter.update_yaxes(showgrid=True, gridwidth=1, gridcolor='grey')
-
-scatter2=dict(
-    type='Scatter',
-    x=df_plot['review_scores_cleanliness'],
-    y=df_plot['review_scores_communication'],
-    mode='markers',
-    marker_color=df_plot['bedrooms'],
-    customdata=customdata,
-)
-
-layout2 = dict(
-    plot_bgcolor='grid',
-    paper_bgcolor='white',
-    xaxis_title='review_scores_cleanliness',
-    yaxis_title='review_scores_communication',
-    title=dict(
-        text='Scatterplot 2',
-        xanchor='center',
-        xref='container',
+    fig_scatter.update_layout(
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        xaxis_title=feature[0],
+        yaxis_title=feature[1],
+        title_text=title,
+        title_x=0.5,
+        yaxis_zeroline=False,
+        xaxis_zeroline=False,
+        dragmode='select',
     )
+
+    fig_scatter.update_xaxes(showgrid=True, gridwidth=1, gridcolor='grey')
+    fig_scatter.update_yaxes(showgrid=True, gridwidth=1, gridcolor='grey')
+
+    return fig_scatter
+
+fig_scatter = make_scatter(
+    feature=['review_scores_checkin', 'review_scores_accuracy'],
+    color_by='bedrooms',
+    title='Scatter Plot 1',
 )
 
-fig_scatter2 = dict(
-    data=[scatter2],
-    layout=layout2,
+fig_scatter2 = make_scatter(
+    feature=['review_scores_checkin', 'review_scores_accuracy'],
+    color_by='bedrooms',
+    title='Scatter Plot 2',
 )
-
-go.Scatter()

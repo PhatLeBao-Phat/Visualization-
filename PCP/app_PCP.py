@@ -72,7 +72,6 @@ def update_PCP(dropdown_value, selected_data):
     fig = make_PCP(features, df_plot)
     return fig 
 
-
 # Linking between scatterplot
 @app.callback(
     Output('demo-scatter2', 'figure'),
@@ -85,18 +84,39 @@ def update_scatter2(selected_data):
         selected_index = [  # show only selected indices
             x.get('pointIndex', None) for x in selected_data['points']
         ]
-    fig = fig_scatter2
-    fig.data[0].update(
+    feature=['review_scores_checkin', 'review_scores_accuracy']
+    color_by='bedrooms'
+    title='Scatter Plot 2'
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=df_plot[feature[0]],
+            y=df_plot[feature[1]],
+            mode='markers',
+            marker_color=df_plot[color_by],
             selectedpoints=selected_index,
-
-            # color of selected points
             selected=dict(marker=dict(color='orange')),
-
-            # color of unselected pts
             unselected=dict(marker=dict(color='rgb(200,200,200)', opacity=0.9))
         )
+    )
 
-    return fig 
+    fig.update_layout(
+        plot_bgcolor='white',
+        paper_bgcolor='white',
+        xaxis_title=feature[0],
+        yaxis_title=feature[1],
+        title_text=title,
+        title_x=0.5,
+        yaxis_zeroline=False,
+        xaxis_zeroline=False,
+        dragmode='select',
+    )
+
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='grey')
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='grey')
+
+    return fig
 
 
 @app.callback(
@@ -113,7 +133,7 @@ def print_out(selectedData):
         ]
     fuc = str(type(selected_index))
 
-    return json.dumps(selectedData, indent=2), fuc
+    return json.dumps(selected_index, indent=2), fuc
 
 app.run_server(debug=True, dev_tools_ui=False)  # Turn off reloader if inside Jupyter
 
