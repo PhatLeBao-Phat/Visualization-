@@ -1,0 +1,146 @@
+#visualization-container {
+    transition: transform;
+    transition-timing-function: ease;
+    transition-duration: 400ms;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+#visualization-menu-container[data-menu-toggle="appear"] #visualization-container{
+    transform: translateY(-30%);
+}
+
+#visualization-menu-container[data-menu-toggle="collapsed"] #visualization-container{
+    transform: translateY(0%);
+}
+
+#menu-button-container {
+    height: 4rem;
+    width: 4rem;
+    position: fixed;
+    left: 50%;
+    top: 90%;
+    bottom: 3rem;
+    z-index: 99;
+}
+
+#menu-button > i{
+    position: absolute;
+    opacity: 0;
+    top: 50%;
+    left: 50%;
+    color: white;
+    transform: translate(-50%, -50%);
+    transition: opacity;
+    transition-timing-function: ease;
+    transition-duration: 400ms;
+}
+
+#menu-button {
+    height: 4rem;
+    width: 4rem;
+    transform: translateX(-50%);
+    background-color: lightgreen;
+    border: none;
+    border-radius: 5rem;
+    outline: none;
+    box-shadow: 0rem 0rem 5rem rgba(0 0 0 / 35%);
+    cursor: pointer;
+    transition: transform, background-color;
+    transition-timing-function: ease;
+    transition-duration: 400ms;
+}
+
+#menu-button:hover {
+    transform: translateX(-50%) scale(1.20);
+
+}
+
+#menu-button:active {
+    transform: translateX(-50%) scale(0.70);
+    background-color: whitesmoke;
+}
+
+#visualization-menu-container[data-menu-toggle="collapsed"] #menu-button:hover .open {
+    opacity: 1;
+    z-index: 3;
+}
+
+#visualization-menu-container[data-menu-toggle="appear"] .close {
+    opacity: 1;
+}
+
+#visualization-menu-container[data-menu-toggle="appear"] #menu-button {
+    background-color: rgb(240, 124, 124);
+}
+
+#visualization-menu-container[data-menu-toggle="collapsed"] .close {
+    opacity: 0;
+    z-index: 1;
+}
+
+#menu-container {
+    width: 200%;
+    height: 29%;
+    bottom: 0px;
+    position: absolute;
+    display: inline-block;
+    z-index: -1;
+}
+
+#menu-container .menu-option:not(:hover) {
+    opacity: 0.8;
+}
+
+#menu-container .menu-option:hover {
+    opacity: 1;
+}
+
+#menu-container .menu-option {
+    background-color: white;
+    border: none;
+    position: flex;
+    display: inline-block;
+    top: 50%;
+    aspect-ratio: 3 / 2;
+    height: 90%;
+    padding-right: 10px;
+    margin: 10px;
+    cursor: pointer;
+    transition: transform;
+    transition-timing-function: ease;
+    transition-duration: 400ms;
+}
+
+#visualization-menu-container[data-menu-toggle="appear"] #menu-container .menu-option {
+    transform: translateY(0) scale(1);
+}
+
+#visualization-menu-container[data-menu-toggle="collapsed"] #menu-container .menu-option {
+    transform: translateY(70%) scale(0.9);
+}
+
+#menu-container .menu-option:hover {
+    opacity: 1;
+}
+
+#menu-container .menu-option label {
+    position: relative;
+    float: left;
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: black;
+}
+
+#menu-container .menu-option img {
+    border: none;
+    position: relative;
+    background-color: green;
+    width: 100%;
+    height: 80%;
+    bottom: 0px;
+    border-radius: 1rem;
+}

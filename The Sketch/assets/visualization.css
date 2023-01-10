@@ -1,0 +1,5 @@
+#visualization-container {
+    background-color: white;
+    display: inline-block;
+    position: fixed;
+}

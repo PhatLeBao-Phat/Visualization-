@@ -1,0 +1,76 @@
+.option-button {
+    height: 2rem;
+    width: 4rem;
+    border-radius: 0.5rem;
+    border: none;
+    box-shadow: 0rem 0rem 5rem rgba(0 0 0 / 10%);
+    transition: transform border-radius background-color;
+    transition-timing-function: ease;
+    transition-duration: 250ms;
+    display: inline-block;
+    margin-right: 10px;
+    cursor: pointer;
+    z-index: 6;
+}
+
+.option-button:hover {
+    transform: scale(1.10);
+    border-radius: 0.5rem !important;
+}
+
+.option-button:active {
+    transform: scale(1);
+    background-color: whitesmoke;    
+}
+
+#options-container[data-filter-toggle="out"] .option-button:active {
+    filter: brightness(110%)
+}
+
+#options-container[data-filter-toggle="out"] #filter-button {
+    border-radius: 0.5rem 0.5rem 0rem 0rem;
+    background-color: lightgray;
+}
+
+#filter-container {
+    transform-origin: top center;
+    background-color: lightgray;
+    position: fixed;
+    z-index: 5;
+    padding: 10px 20px;
+    border-radius: 0px 25px 25px 25px;
+    width: 49%;
+    display: block;
+}
+
+#filter-container + div {
+    background-color: lightgray;    
+}
+
+#options-container[data-filter-toggle="in"] #filter-container {
+    animation: growUp 200ms ease-in-out forwards;
+}
+
+@keyframes growUp {
+    0% {
+        transform: scaleY(1)
+    }
+
+    100% {
+        transform: scaleY(0)
+    }
+}
+
+#options-container[data-filter-toggle="out"] #filter-container {
+    animation: growDown 200ms ease-in-out forwards;
+}
+
+@keyframes growDown {
+    0% {
+        transform: scaleY(0)
+    }
+
+    100% {
+        transform: scaleY(1)
+    }
+}
