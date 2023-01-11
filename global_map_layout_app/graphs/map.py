@@ -9,7 +9,6 @@ def figure(self, filtered_data, clustering_key):
 
     # Update layout to have a background. Zoom and center it in New York
     fig.update_layout(mapbox = {"style": "carto-positron", "zoom": 10, "center": {"lon": -73.96276, "lat": 40.68152}})
-    fig.update_layout(height=1000)
 
     return fig
 

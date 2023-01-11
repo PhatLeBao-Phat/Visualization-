@@ -1,0 +1,9 @@
+#visualization-container {
+    right: 0;
+    position: fixed;
+    display: block;
+    height: 97%;
+    bottom: 0;
+    max-width: 50rem;
+    background-color: blue;
+}
