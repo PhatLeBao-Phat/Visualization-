@@ -1,9 +1,10 @@
 #visualization-container {
+    position: absolute;
     right: 0;
-    position: fixed;
-    display: block;
-    height: 97%;
-    bottom: 0;
-    max-width: 50rem;
     background-color: blue;
+    width: 60%;
+}
+
+#treemap-1 {
+    display: block;
 }

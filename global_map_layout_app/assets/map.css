@@ -1,5 +1,5 @@
 #map-1 {
-    position: absolute;
+    position: fixed;
+    width: 40%;
     height: 100%;
-    width: 100%;
 }

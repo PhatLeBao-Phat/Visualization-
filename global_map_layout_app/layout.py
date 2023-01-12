@@ -1,4 +1,4 @@
-# I need to the os for folder magic
+# I need os for folder magic
 import os
 import pandas as pd
 import numpy as np
@@ -64,15 +64,21 @@ map.assign_figure(map_figure)
 
 treemap = CustomFigure("treemap", "1")
 treemap.assign_figure(treemap_figure)
+treemap.showed = ["neighbourhood group", "room type"]
 
 filter_dropdowns = DropDown(data, "parameters_filter_dropdown", ["neighbourhood group", "room type", "Construction year"])
-filter_rangesliders = RangeSlider(data, "parameters_filter_rangesliders", ["price", "review rate number"], [50, 1])
+filter_rangesliders = RangeSlider(data, "parameters_filter_rangesliders", ["price", "review rate number"], [100, 1])
 
 app = Dash(__name__)
 
 app.layout = html.Div([
     dcc.Store(id="memory-graphs"),
+    dcc.Store(id="memory-treemap"),
     map.html,
+    html.Div([
+        treemap.html,
+        html.Pre(id="print")
+    ], id="visualization-container"),
     html.Div([
         html.Div([
             dcc.Dropdown(
@@ -90,20 +96,29 @@ app.layout = html.Div([
                 n_clicks=0
                 ),   
         ], id="menu-button-container")
-    ], id="menu-container", **{"data-menu-toggle": "collapsed"}),
-    html.Div([
-        treemap.html
-    ], id="visualization-container")   
+    ], id="menu-container", **{"data-menu-toggle": "collapsed"})
 ])
 
 # @app.callback(
 #     Output("print", "children"),
 #     Input("clustering-key", "value"),
-#     filter_dropdowns.inputs
+#     Input("treemap-1", "clickData"),
+#     Input("treemap-1", "selectedData"),
+#     Input("memory-treemap", "data")
 # )
-# def to_print(blab, parameters_filter_dropdown):
-#     return json.dumps(parameters_filter_dropdown)
+# def to_print(blab, parameters_filter_dropdown, lolo, bla):
+#     if parameters_filter_dropdown is None:
+#         return None
 
+#     return json.dumps(
+#         {"lol": lol,
+#         "selectedData": lol,
+#         "derived": "nee",
+#         "shit": bla
+#         }
+#         , indent=2)
+
+# Menu
 @app.callback(
     Output("menu-container", "data-menu-toggle"),
     Input("menu-button", "n_clicks"),
@@ -128,8 +143,37 @@ def filter_data(parameters_filter_dropdown, parameters_filter_rangeslider):
 
     return filtered.to_dict('records')
 
+# Store the data of clickData of treemap
+@app.callback(
+    Output("memory-treemap", "data"),
+    Input("treemap-1", "clickData")
+)
+def highlight_map(clicked):
+    if clicked is None:
+        return None
+
+    derived = clicked["points"][0]["customdata"]
+    
+    return ' & '.join(["({} == {})".format("`{}`".format(key), '"{}"'.format(elem)) for key, elem in zip(treemap.showed, derived) if elem != "(?)"])
+
 @app.callback(
     map.output,
+    Input("memory-graphs", "data"),
+    Input("memory-treemap", "data"),
+    Input("clustering-key", "value")
+)
+def update_map(filtered_dict, treemap_highlight, clustering_key = "neighbourhood group"):
+    filtered = pd.DataFrame.from_records(filtered_dict)
+
+    if treemap_highlight is not None:
+        filtered.loc[filtered.query(treemap_highlight).index, clustering_key] = "highlighted"
+
+    time.sleep(1)
+    return (
+        map.figure(filtered, clustering_key)
+    )
+
+@app.callback(
     treemap.output,
     Input("memory-graphs", "data"),
     Input("clustering-key", "value")
@@ -139,8 +183,15 @@ def update_map(filtered_dict, clustering_key = "neighbourhood group"):
 
     time.sleep(1)
     return (
-        map.figure(filtered, clustering_key),
         treemap.figure(filtered, clustering_key)
     )
 
 app.run_server(debug=True)
+
+value = "Brooklyn"
+data.loc[data.query('`neighbourhood group` == @value').index, "neighbourhood group"] = "highlighted"
+print(data["neighbourhood group"].unique())
+print(data)
+
+
+

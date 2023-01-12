@@ -14,7 +14,7 @@ class RangeSlider(filter.Filter):
             min = dff.min()
             max = dff.max()
             #marks = {int(number): str(int(number)) for number in dff.unique()}
-            range_sliders.append(dcc.RangeSlider(id="range-slider-{}".format(variable), step=step[index], min=min, max=max, marks=marks, value=[min, max]))
+            range_sliders.append(dcc.RangeSlider(id="range-slider-{}".format(variable), min=min, max=max, marks=marks, value=[min, max], tooltip={"placement": "bottom", "always_visible": True}))
             
         inputs = {input_name: [Input("range-slider-{}".format(variable), "value") for variable in attributes]}
 
