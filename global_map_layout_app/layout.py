@@ -42,6 +42,7 @@ from graphs.map import figure as map_figure
 from graphs.treemap import figure as treemap_figure
 from filters.dropdown import DropDown
 from filters.rangeslider import RangeSlider
+import color
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -50,6 +51,7 @@ import pandas as pd
 import numpy as np
 import json
  
+import dash
 from dash import html, Dash, ctx, dcc
 from dash.dependencies import Input, Output, State
 
@@ -74,6 +76,8 @@ app = Dash(__name__)
 app.layout = html.Div([
     dcc.Store(id="memory-graphs"),
     dcc.Store(id="memory-treemap"),
+    dcc.Store(id="memory-colormap"),
+    dcc.Store(id="memory-map"),
     map.html,
     html.Div([
         treemap.html,
@@ -99,24 +103,19 @@ app.layout = html.Div([
     ], id="menu-container", **{"data-menu-toggle": "collapsed"})
 ])
 
-# @app.callback(
-#     Output("print", "children"),
-#     Input("clustering-key", "value"),
-#     Input("treemap-1", "clickData"),
-#     Input("treemap-1", "selectedData"),
-#     Input("memory-treemap", "data")
-# )
-# def to_print(blab, parameters_filter_dropdown, lolo, bla):
-#     if parameters_filter_dropdown is None:
-#         return None
+@app.callback(
+    Output("print", "children"),
+    Input("map-1", "selectedData"),
+    Input("memory-map", "data"),
+)
+def to_print(selected, data):
 
-#     return json.dumps(
-#         {"lol": lol,
-#         "selectedData": lol,
-#         "derived": "nee",
-#         "shit": bla
-#         }
-#         , indent=2)
+    return json.dumps(
+        {
+            # "selected": selected,
+            "data": data
+        }
+        , indent=2)
 
 # Menu
 @app.callback(
@@ -139,51 +138,107 @@ def filter_data(parameters_filter_dropdown, parameters_filter_rangeslider):
     query2 = " & ".join(filter_rangesliders.conditions_func(list(parameters_filter_rangeslider.values())[0]))
     query = " & ".join(["{}".format(query1), "{}".format(query2)])
 
+
+
     filtered = data.query(query)
+
 
     return filtered.to_dict('records')
 
 # Store the data of clickData of treemap
 @app.callback(
     Output("memory-treemap", "data"),
-    Input("treemap-1", "clickData")
+    Input("treemap-1", "clickData"),
+    Input("clustering-key", "value")
 )
-def highlight_map(clicked):
+def highlight_map(clicked, clustering_key):
     if clicked is None:
         return None
 
-    derived = clicked["points"][0]["customdata"]
+    # Remove selection when color change
+    if ctx.triggered[0]["prop_id"].split(".")[0] == "clustering-key":
+        return None
+
+    try:
+        derived = clicked["points"][0]["customdata"]
+    except:
+        return None
     
     return ' & '.join(["({} == {})".format("`{}`".format(key), '"{}"'.format(elem)) for key, elem in zip(treemap.showed, derived) if elem != "(?)"])
+
+# Store the colormap
+@app.callback(
+    Output("memory-colormap", "data"),
+    Input("memory-graphs", "data"),
+    Input("clustering-key", "value")
+)
+def update_colormap(filtered_dict, clustering_key):
+    filtered = pd.DataFrame.from_records(filtered_dict)
+    return color.color(filtered, clustering_key)
+
+# Store the selection on the map
+@app.callback(
+    Output("memory-map", "data"),
+    Input("memory-map", "data"),
+    Input("map-1", "selectedData"),
+    Input("clustering-key", "value")
+)
+def highlight_map(prev_selected, selected, clustering_key):
+    if selected is None:
+        return prev_selected
+
+    # # Remove selection when color change
+    # if ctx.triggered[0]["prop_id"].split(".")[0] == "clustering-key":
+    #     return None
+
+    right_bottom_y = selected["range"]["mapbox"][0][0]
+    right_bottom_x = selected["range"]["mapbox"][0][1]
+    left_top_y = selected["range"]["mapbox"][1][0]
+    left_top_x = selected["range"]["mapbox"][1][1]
+    # data_bool = (data["long"] > right_bottom[0]) & (data["lat"] < right_bottom[1]) & (data["long"] < left_top[0]) & (data["lat"] > left_top[1])
+
+    return "((long > {}) & (lat < {}) & (long < {}) & (lat > {}))".format(right_bottom_y, right_bottom_x, left_top_y, left_top_x)
 
 @app.callback(
     map.output,
     Input("memory-graphs", "data"),
     Input("memory-treemap", "data"),
-    Input("clustering-key", "value")
+    Input("memory-colormap", "data"),
+    Input("memory-map", "data"),
+    Input("clustering-key", "value"),
 )
-def update_map(filtered_dict, treemap_highlight, clustering_key = "neighbourhood group"):
+def update_map(filtered_dict, treemap_highlight, color_map, selected, clustering_key = "neighbourhood group"):
     filtered = pd.DataFrame.from_records(filtered_dict)
 
+    if selected is not None:
+        filtered = filtered.query(selected)
+        # filtered.loc[filtered.query(selected).index, clustering_key] = "selected"
+
     if treemap_highlight is not None:
-        filtered.loc[filtered.query(treemap_highlight).index, clustering_key] = "highlighted"
+        # filtered.loc[filtered.query(treemap_highlight).index, clustering_key] = "highlighted"
+        filtered = filtered.query(treemap_highlight)
 
     time.sleep(1)
     return (
-        map.figure(filtered, clustering_key)
+        map.figure(filtered, clustering_key, color_map)
     )
 
 @app.callback(
     treemap.output,
     Input("memory-graphs", "data"),
+    Input("memory-colormap", "data"),
+    Input("memory-map", "data"),
     Input("clustering-key", "value")
 )
-def update_map(filtered_dict, clustering_key = "neighbourhood group"):
+def update_map(filtered_dict, color_map, selected, clustering_key = "neighbourhood group"):
     filtered = pd.DataFrame.from_records(filtered_dict)
+
+    if selected is not None:
+        filtered = filtered.query(selected)
 
     time.sleep(1)
     return (
-        treemap.figure(filtered, clustering_key)
+        treemap.figure(filtered, clustering_key, color_map)
     )
 
 app.run_server(debug=True)
@@ -192,6 +247,8 @@ value = "Brooklyn"
 data.loc[data.query('`neighbourhood group` == @value').index, "neighbourhood group"] = "highlighted"
 print(data["neighbourhood group"].unique())
 print(data)
+
+
 
 
 
