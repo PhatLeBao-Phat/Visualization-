@@ -1,0 +1,85 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+#menu-container {
+    position: fixed;
+    height: 100%;
+    max-width: 35rem;
+    display: inline-grid;
+    grid-template-columns: auto 5rem;
+    transform: translateX(-30rem);
+    transition: transform;
+    transition-timing-function: ease;
+    transition-duration: 400ms;
+}
+
+#menu-filter-container {
+    background-color: grey;
+}
+
+#menu-button {
+    width: 5rem;
+    height: 5rem;
+    margin: 2.5rem;
+    background-color: lightgreen;
+    border: none;
+    outline: none;
+    position: relative;
+    top: 50%;
+    border-radius: 5rem;
+    box-shadow: 0rem 0rem 5rem rgba(0 0 0 / 35%);
+    cursor: pointer;
+    transition: transform, background-color;
+    transition-timing-function: ease;
+    transition-duration: 400ms;
+}
+
+#menu-button > i{
+    position: absolute;
+    opacity: 0;
+    top: 50%;
+    left: 50%;
+    color: white;
+    transform: translate(-50%, -50%);
+    transition: opacity;
+    transition-timing-function: ease;
+    transition-duration: 400ms;
+}
+
+#menu-button:hover {
+    transform: scale(1.10);
+
+}
+
+#menu-button:active {
+    transform: scale(1);
+    background-color: whitesmoke;
+}
+
+#menu-container[data-menu-toggle="collapsed"] #menu-button:hover .open {
+    opacity: 1;
+    z-index: 3;
+}
+
+#menu-container[data-menu-toggle="appear"] .close {
+    opacity: 1;
+}
+
+#menu-container[data-menu-toggle="appear"] #menu-button {
+    background-color: rgb(240, 124, 124);
+}
+
+#menu-container[data-menu-toggle="collapsed"] .close {
+    opacity: 0;
+    z-index: 1;
+}
+
+#menu-container[data-menu-toggle="collapsed"] {
+    transform: translateX(-30rem)
+}
+
+#menu-container[data-menu-toggle="appear"] {
+    transform: translateX(0)
+}
