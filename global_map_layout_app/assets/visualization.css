@@ -1,0 +1,10 @@
+#visualization-container {
+    position: absolute;
+    right: 0;
+    background-color: blue;
+    width: 60%;
+}
+
+#treemap-1 {
+    display: block;
+}
