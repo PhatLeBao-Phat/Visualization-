@@ -1,41 +1,41 @@
-# I need os for folder magic
-import os
-import pandas as pd
-import numpy as np
+# # I need os for folder magic
+# import os
+# import pandas as pd
+# import numpy as np
 
-# Creates the data folder
-path_to_folder = os.getcwd()
-folder_name = "Data"
-path_to_new_folder = os.path.join(path_to_folder, folder_name)
-if not os.path.exists (path_to_new_folder):
-    os.mkdir(path_to_new_folder)
-    print("\x1b[36m Created data folder \n")
-else:
-    print("\x1b[32m Data folder exists\n ")
+# # Creates the data folder
+# path_to_folder = os.getcwd()
+# folder_name = "Data"
+# path_to_new_folder = os.path.join(path_to_folder, folder_name)
+# if not os.path.exists (path_to_new_folder):
+#     os.mkdir(path_to_new_folder)
+#     print("\x1b[36m Created data folder \n")
+# else:
+#     print("\x1b[32m Data folder exists\n ")
     
-# Checks whether file exists
-dataset_name = "airbnb_open_data.csv"
-path_to_dataset = os.path.join(path_to_new_folder, dataset_name)
+# # Checks whether file exists
+# dataset_name = "airbnb_open_data.csv"
+# path_to_dataset = os.path.join(path_to_new_folder, dataset_name)
 
-if os.path.exists (path_to_dataset):
-    print("\x1b[32m Dataset {} is loaded in succesfully!".format(dataset_name))
+# if os.path.exists (path_to_dataset):
+#     print("\x1b[32m Dataset {} is loaded in succesfully!".format(dataset_name))
     
-    # Load in dataset
-    data = pd.read_csv(path_to_dataset)
-else:
-    print(path_to_dataset)
-    print("\x1b[31m Dataset still needs to be put in the data folder!\n \n Go to canvas page of visualization and go to the datasets in files.\n Download the airbnb_open_data.csv and put it in the data folder.")
+#     # Load in dataset
+#     df_bnb = pd.read_csv(path_to_dataset)
+# else:
+#     print(path_to_dataset)
+#     print("\x1b[31m Dataset still needs to be put in the data folder!\n \n Go to canvas page of visualization and go to the datasets in files.\n Download the airbnb_open_data.csv and put it in the data folder.")
 
-# Fast clean
-data = data.replace("NaN", np.nan)
-data = data.replace("nan", np.nan)
+# # Fast clean
+# df_bnb = df_bnb.replace("NaN", np.nan)
+# df_bnb = df_bnb.replace("nan", np.nan)
 
-data = data.dropna(subset=["price", "review rate number", "room type", "neighbourhood group"])
+# df_bnb = df_bnb.dropna(subset=["price", "review rate number", "room type", "neighbourhood group"])
 
-def cleaning_price(price : str) -> int:
-    return int(str(price).translate({ord('$'): None, ord(","): None}))
+# def cleaning_price(price : str) -> int:
+#     return int(str(price).translate({ord('$'): None, ord(","): None}))
 
-data["price"] = data["price"].apply(lambda x: cleaning_price(x))
+# df_bnb["price"] = df_bnb["price"].apply(lambda x: cleaning_price(x))
 
 from figure import FigureManager, CustomFigure
 from graphs.map import figure as map_figure
@@ -58,6 +58,9 @@ from dash.dependencies import Input, Output, State
 from typing import Union
 from types import MethodType
 
+from data.data_helpers import df_bnb
+from graphs.PCP import DIMS, make_PCP
+
 import time
 
 manager = FigureManager()
@@ -66,10 +69,10 @@ map.assign_figure(map_figure)
 
 treemap = CustomFigure("treemap", "1")
 treemap.assign_figure(treemap_figure)
-treemap.showed = ["neighbourhood group", "room type"]
+treemap.showed = ["neighbourhood_group_cleansed", "room_type"]
 
-filter_dropdowns = DropDown(data, "parameters_filter_dropdown", ["neighbourhood group", "room type", "Construction year"])
-filter_rangesliders = RangeSlider(data, "parameters_filter_rangesliders", ["price", "review rate number"], [100, 1])
+filter_dropdowns = DropDown(df_bnb, "parameters_filter_dropdown", ["neighbourhood_group_cleansed", "room_type"])
+filter_rangesliders = RangeSlider(df_bnb, "parameters_filter_rangesliders", ["price_cleansed", "review_scores_rating"], [100, 1])
 
 app = Dash(__name__)
 
@@ -81,13 +84,24 @@ app.layout = html.Div([
     map.html,
     html.Div([
         treemap.html,
+        html.Div([
+            dcc.Dropdown(
+                id='PCP-dropdown',
+                options=['accuracy', 'checkin', 'cleanliness', 'communication', 'location', 'response rate', 'acceptance rate'],
+                value=['accuracy', 'communication', 'location'],
+                multi=True,
+                searchable=False,
+            ),
+
+            dcc.Graph(id='PCP'),
+        ]),
         html.Pre(id="print")
     ], id="visualization-container"),
     html.Div([
         html.Div([
             dcc.Dropdown(
-                data.columns,
-                "neighbourhood group",
+                df_bnb.columns,
+                "neighbourhood_group_cleansed",
                 id="clustering-key"
             ),
             html.Div(filter_dropdowns.children),
@@ -103,19 +117,19 @@ app.layout = html.Div([
     ], id="menu-container", **{"data-menu-toggle": "collapsed"})
 ])
 
-@app.callback(
-    Output("print", "children"),
-    Input("map-1", "selectedData"),
-    Input("memory-map", "data"),
-)
-def to_print(selected, data):
+# @app.callback(
+#     Output("print", "children"),
+#     Input("map-1", "selectedData"),
+#     Input("memory-map", "data"),
+# )
+# def to_print(selected, data):
 
-    return json.dumps(
-        {
-            # "selected": selected,
-            "data": data
-        }
-        , indent=2)
+#     return json.dumps(
+#         {
+#             # "selected": selected,
+#             "data": data
+#         }
+#         , indent=2)
 
 # Menu
 @app.callback(
@@ -138,10 +152,7 @@ def filter_data(parameters_filter_dropdown, parameters_filter_rangeslider):
     query2 = " & ".join(filter_rangesliders.conditions_func(list(parameters_filter_rangeslider.values())[0]))
     query = " & ".join(["{}".format(query1), "{}".format(query2)])
 
-
-
-    filtered = data.query(query)
-
+    filtered = df_bnb.query(query)
 
     return filtered.to_dict('records')
 
@@ -197,7 +208,7 @@ def highlight_map(prev_selected, selected, clustering_key):
     left_top_x = selected["range"]["mapbox"][1][1]
     # data_bool = (data["long"] > right_bottom[0]) & (data["lat"] < right_bottom[1]) & (data["long"] < left_top[0]) & (data["lat"] > left_top[1])
 
-    return "((long > {}) & (lat < {}) & (long < {}) & (lat > {}))".format(right_bottom_y, right_bottom_x, left_top_y, left_top_x)
+    return "((longitude > {}) & (latitude < {}) & (longitude < {}) & (latitude > {}))".format(right_bottom_y, right_bottom_x, left_top_y, left_top_x)
 
 @app.callback(
     map.output,
@@ -228,25 +239,64 @@ def update_map(filtered_dict, treemap_highlight, color_map, selected, clustering
     Input("memory-graphs", "data"),
     Input("memory-colormap", "data"),
     Input("memory-map", "data"),
+    Input('PCP-dropdown', 'value'),
     Input("clustering-key", "value")
 )
-def update_map(filtered_dict, color_map, selected, clustering_key = "neighbourhood group"):
+def update_map(filtered_dict, color_map, selected, dropdown_value, clustering_key = "neighbourhood group"):
     filtered = pd.DataFrame.from_records(filtered_dict)
+    features = [DIMS[feature] for feature in dropdown_value]
 
     if selected is not None:
         filtered = filtered.query(selected)
 
     time.sleep(1)
     return (
-        treemap.figure(filtered, clustering_key, color_map)
+        treemap.figure(filtered, clustering_key, color_map, dropdown_value)
     )
+
+@app.callback(
+    Output('PCP', 'figure'),
+    Input("memory-graphs", "data"),
+    Input("memory-treemap", "data"),
+    Input("memory-map", "data"),
+    Input('PCP-dropdown', 'value'),
+    Input("clustering-key", "value")
+)
+def update_map(filtered_dict, treemap_highlight, selected, dropdown_value, clustering_key = "neighbourhood group"):
+    filtered = pd.DataFrame.from_records(filtered_dict)
+    features = [DIMS[feature] for feature in dropdown_value]
+
+    if selected is not None:
+        filtered = filtered.query(selected)
+        # filtered.loc[filtered.query(selected).index, clustering_key] = "selected"
+
+    if treemap_highlight is not None:
+        # filtered.loc[filtered.query(treemap_highlight).index, clustering_key] = "highlighted"
+        filtered = filtered.query(treemap_highlight)
+
+    time.sleep(1)
+    return (
+        make_PCP(features, filtered)#, clustering_key)
+    )
+
+# # Callback function 
+# @app.callback(
+#     Output('PCP', 'figure'),
+#     Input('PCP-dropdown', 'value'),
+# )
+# def update_PCP(dropdown_value):
+#     features = [DIMS[feature] for feature in dropdown_value]
+    
+#     # Plot the PCP
+#     fig = make_PCP(features, df_bnb)
+#     return fig 
 
 app.run_server(debug=True)
 
 value = "Brooklyn"
-data.loc[data.query('`neighbourhood group` == @value').index, "neighbourhood group"] = "highlighted"
-print(data["neighbourhood group"].unique())
-print(data)
+df_bnb.loc[df_bnb.query('`neighbourhood group` == @value').index, "neighbourhood group"] = "highlighted"
+print(df_bnb["neighbourhood group"].unique())
+print(df_bnb)
 
 
 

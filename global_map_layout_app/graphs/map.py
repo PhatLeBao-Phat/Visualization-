@@ -1,11 +1,12 @@
-from color import color
+# from color import color
+
 
 def figure(self, filtered_data, clustering_key, color_map):
     # Create map with the data
     # fig = px.scatter_mapbox(filtered_data, lat="lat", lon="long", color=filtered_data[clustering_key], custom_data={})
     # fig = px.scatter_mapbox(filtered_data, lat="lat", lon="long", color=clustering_key, color_discrete_sequence=px.colors.qualitative.G10, custom_data={})
     # fig = px.scatter_mapbox(filtered_data, lat="lat", lon="long", color=clustering_key, color_discrete_map=color(filtered_data, clustering_key), custom_data={})
-    fig = px.scatter_mapbox(filtered_data, lat="lat", lon="long", color=clustering_key, color_discrete_map=color_map, custom_data={})
+    fig = px.scatter_mapbox(filtered_data, lat="latitude", lon="longitude", color=clustering_key, color_discrete_map=color_map, custom_data={})
 
 
     # Selected points get highlighted yellow and size of marks are 5
