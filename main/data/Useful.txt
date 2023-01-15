@@ -1,0 +1,156 @@
+Attributes that I think might be useful. I ofc didn't include the one I think are useless for our project BUT scroll down you can see all of them
+For the people when to explore the dataset here is the link ttp://insideairbnb.com/get-the-data.
+The one on Kaggle is literally the one we use for this project without extenstion but is cleaned. 
+
+- Location: 
+    latitude 
+    longtitude
+
+- neighbourhood:
+    neighbourhood                   text    combined 
+    neighborhood_overview           text    description of the neighbourhood
+    neighbourhood_cleansed          text    detail like Kingston, Midtown...
+    neighbourhood_group_cleansed    text    detail like Brooklyn, Queens,...
+
+- Information about the host: 
+    host_id 	                integer	Airbnb's unique identifier for the host/user
+    host_name	                text	Name of the host. Usually just the first name(s).
+    host_since	                date	The date the host/user was created. For hosts that are Airbnb guests this could be the date they registered as a guest.
+    host_location	            text	The host's self reported location
+    host_about	                text	Description about the host
+    host_response_time		
+    host_response_rate		
+    host_acceptance_rate		That rate at which a host accepts booking requests.
+    host_is_superhost	        boolean 	[t=true; f=false]
+    host_listings_count	        text	The number of listings the host has (per Airbnb calculations)
+    host_total_listings_count	text	The number of listings the host has (per Airbnb calculations) this is basically the view 
+    host_verifications          ['email', 'phone', 'work_email']
+
+- Information about total listing this host has:
+    calculated_host_listings_count
+    calculated_host_listings_count_entire_homes
+    calculated_host_listings_count_private_rooms
+    calculated_host_listings_count_shared_rooms
+
+- Information about the accomodation (the listing)
+    property_type	text	Self selected property type. Hotels and Bed and Breakfasts are described as such by their hosts in this field
+    room_type       text    grouped into the followingthree room types [Entire place, private room, shared room]
+
+- Information about the room: 
+    property_type
+    room_type
+    accommodates
+    bathrooms
+    bathrooms_text
+    bedrooms
+    beds
+    amenities
+    price
+    minimum_nights
+    maximum_nights
+
+- availability:
+    minimum_nights  
+    maximum_nights
+    has_availability    [True, False]
+    availability_30     availability of the listing x data into the future 
+    availability_60
+    availability_90
+    availability_365
+
+- Review 
+    number_of_reviews_ltm       in last 12 months
+    number_of_reviews_l30d      in last 30 days
+    first_review
+    last_review
+    review_scores_rating
+    review_scores_accuracy
+    review_scores_cleanliness
+    review_scores_checkin
+    review_scores_communication
+    review_scores_location
+    review_scores_value
+    reviews_per_month
+
+
+- Booking policy:
+    instant_bookable
+
+###############################################
+### BELOW IS THE LIST OF ALL THE ATTRIBUTES ###   
+###############################################
+id
+listing_url
+scrape_id
+last_scraped
+source
+name
+description
+neighborhood_overview
+picture_url
+host_id
+host_url
+host_name
+host_since
+host_location
+host_about
+host_response_time
+host_response_rate
+host_acceptance_rate
+host_is_superhost
+host_thumbnail_url
+host_picture_url
+host_neighbourhood
+host_listings_count
+host_total_listings_count
+host_verifications
+host_has_profile_pic
+host_identity_verified
+neighbourhood
+neighbourhood_cleansed
+neighbourhood_group_cleansed
+latitude
+longitude
+property_type
+room_type
+accommodates
+bathrooms
+bathrooms_text
+bedrooms
+beds
+amenities
+price
+minimum_nights
+maximum_nights
+minimum_minimum_nights
+maximum_minimum_nights
+minimum_maximum_nights
+maximum_maximum_nights
+minimum_nights_avg_ntm
+maximum_nights_avg_ntm
+calendar_updated
+has_availability
+availability_30
+availability_60
+availability_90
+availability_365
+calendar_last_scraped
+number_of_reviews
+number_of_reviews_ltm
+number_of_reviews_l30d
+first_review
+last_review
+review_scores_rating
+review_scores_accuracy
+review_scores_cleanliness
+review_scores_checkin
+review_scores_communication
+review_scores_location
+review_scores_value
+license
+instant_bookable
+calculated_host_listings_count
+calculated_host_listings_count_entire_homes
+calculated_host_listings_count_private_rooms
+calculated_host_listings_count_shared_rooms
+reviews_per_month

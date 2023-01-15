@@ -1,0 +1,82 @@
+#root {
+    height: 100%;
+    overflow: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    background-color: rgb(231, 231, 231);
+    flex-grow: 1.5;
+    margin: 0px;
+    min-height: 100vh;
+}
+
+#left-column {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 1.5rem;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    width: 40%;
+}
+
+#right-column {
+    /* box-shadow: 1px 1px 10px black; */
+    border-radius: 0.75rem;
+    background-color: white;
+    margin: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    width: 70%;
+}
+
+#title_sidebar {
+    /* border-left: rgb(28, 28, 153) solid 1rem; */
+    text-align: center;
+    color: black;
+    font-size: 1.3rem;
+    /* margin-bottom: 1rem; */
+}
+
+.hr {
+    margin-top: 0.5rem;
+    background-color: black;
+    display: block;
+}
+
+#demo-scatter {
+    background-color: black;
+}
+
+#structure2, #structure1 {
+    margin-top: 1rem;
+    border: thin lightgrey solid;
+    overflow-y: scroll;
+    height: 275px;
+}
+
+#Tree-map-title {
+    text-align: center;
+    color: black;
+    /* background-color: black; */
+    font-size: 1.2rem;
+    margin-bottom: 0rem;
+}
+
+#tree-map {
+    margin-top: 0rem;
+    background-color: white;
+    padding-top: 1rem;
+}
+
+#tree-map-slider {
+    margin-top: 1rem;
+    border-color: black;
+    outline: auto;
+    outline-color:rgb(231, 231, 231);
+    padding-top: 100rem;
+    background-color: white;
+    outline-style: solid;
+
+}

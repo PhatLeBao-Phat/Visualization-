@@ -20,8 +20,8 @@ from types import MethodType
 
 class FigureManager:
     # data : dict = {"points": [], "filtered_data": [], "clustering_key": "neighbourhood group"}
-    app : dict[str: Union[Input, Output, dict]] = {"selectedData": [], "figure": [], "graph": {}}
-    ids : list[str] = []
+    app = {"selectedData": [], "figure": [], "graph": {}}
+    ids = []
 
     def __init__(self) -> None:
         pass
