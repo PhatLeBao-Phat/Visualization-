@@ -160,11 +160,16 @@ def filter_data(parameters_filter_dropdown, parameters_filter_rangeslider):
 @app.callback(
     Output("memory-treemap", "data"),
     Input("treemap-1", "clickData"),
-    Input("clustering-key", "value")
+    Input("clustering-key", "value"),
+    Input("map-1", "selectedData")
 )
-def highlight_map(clicked, clustering_key):
+def highlight_map(clicked, clustering_key, selected):
     if clicked is None:
         return None
+
+    # # Remove selection when selected
+    # if selected is not None:
+    #     return None
 
     # Remove selection when color change
     if ctx.triggered[0]["prop_id"].split(".")[0] == "clustering-key":
