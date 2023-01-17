@@ -56,27 +56,30 @@ app.layout = html.Div([
     dcc.Store(id="memory-map"),
     map.html,
     html.Div([
+        html.Pre("AirBnb Hosts - JBI100 Dashboard", style={"font-size": 60, "text-align": "center", "padding": "20px"}),
         html.Div([
-            html.Pre("First layer", className="treemap-dropdown-text"),
-            dcc.Dropdown(
-                value = "neighbourhood_group_cleansed",
-                id="treemap-layer-1",
-                className="treemap-dropdown"
-            ),
-            html.Pre("Second layer", className="treemap-dropdown-text"),
-            dcc.Dropdown(
-                value = "room_type",
-                id="treemap-layer-2",
-                className="treemap-dropdown"
-            ),
-            html.Pre("Third layer", className="treemap-dropdown-text"),
-            dcc.Dropdown(
-                value = "price_cleansed",
-                id="treemap-layer-3",
-                className="treemap-dropdown"
-            )
-        ], id="treemap-dropdowns-container"),
-        treemap.html,
+            html.Div([
+                html.Pre("First layer", className="treemap-dropdown-text"),
+                dcc.Dropdown(
+                    value = "neighbourhood_group_cleansed",
+                    id="treemap-layer-1",
+                    className="treemap-dropdown"
+                ),
+                html.Pre("Second layer", className="treemap-dropdown-text"),
+                dcc.Dropdown(
+                    value = "room_type",
+                    id="treemap-layer-2",
+                    className="treemap-dropdown"
+                ),
+                html.Pre("Third layer", className="treemap-dropdown-text"),
+                dcc.Dropdown(
+                    value = "bedrooms",
+                    id="treemap-layer-3",
+                    className="treemap-dropdown"
+                )
+            ], id="treemap-dropdowns-container"),
+            treemap.html,
+        ]),
         html.Div([
             dcc.Dropdown(
                 id='PCP-dropdown',
@@ -87,7 +90,7 @@ app.layout = html.Div([
             ),
             pcp.html
         ]),
-        html.Pre(id="print")
+        # html.Pre(id="print")
     ], id="visualization-container"),
     html.Div([
         html.Div([
@@ -109,18 +112,18 @@ app.layout = html.Div([
     ], id="menu-container", **{"data-menu-toggle": "collapsed"})
 ])
 
-@app.callback(
-    Output("print", "children"),
-    Input("treemap-1", "clickData"),
-)
-def to_print(selected):
+# @app.callback(
+#     Output("print", "children"),
+#     Input("treemap-1", "clickData"),
+# )
+# def to_print(selected):
 
-    return json.dumps(
-        {
-            # "selected": selected,
-            "data": selected
-        }
-        , indent=2)
+#     return json.dumps(
+#         {
+#             # "selected": selected,
+#             "data": selected
+#         }
+#         , indent=2)
 
 # Menu
 @app.callback(
@@ -299,6 +302,23 @@ def update_map(filtered_dict, treemap_highlight, selected, dropdown_value, clust
         pcp.figure(features, filtered)#, clustering_key)
         # make_PCP(features, filtered)#, clustering_key)
     )
+
+@app.callback(
+    filter_rangesliders.histogram_output,
+    Input("memory-graphs", "data"),
+    Input("memory-treemap", "data"),
+    Input("memory-map", "data"),
+)
+def update_map(filtered_dict, treemap_highlight, selected):
+    filtered = pd.DataFrame.from_records(filtered_dict)
+
+    if selected is not None:
+        filtered = filtered.query(selected)
+
+    if treemap_highlight is not None:
+        filtered = filtered.query(treemap_highlight)
+
+    return filter_rangesliders.histogram_figures(filtered)
 
 app.run_server(debug=True)
 

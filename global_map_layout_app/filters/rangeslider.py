@@ -1,9 +1,12 @@
-from dash import dcc, Input
+from dash import dcc, Input, Output, html
+import plotly.express as px
 import filter
 
 class RangeSlider(filter.Filter):
-    def __init__(self, data, input_name: str, attributes : list[str], step: list[int, int]) -> None:
+    def __init__(self, data, input_name: str, attributes : list[str], step: list[int, int], names : dict = {}) -> None:
         range_sliders = []
+        self.histogram_output = []
+        self.histogram_lims = {}
         for index, variable in enumerate(attributes):
             marks = {}
             value = []
@@ -13,8 +16,14 @@ class RangeSlider(filter.Filter):
             dff = data[variable]
             min = dff.min()
             max = dff.max()
+            self.histogram_lims[variable] = [min, max]
             #marks = {int(number): str(int(number)) for number in dff.unique()}
-            range_sliders.append(dcc.RangeSlider(id="range-slider-{}".format(variable), min=min, max=max, marks=marks, value=[min, max], tooltip={"placement": "bottom", "always_visible": True}))
+            self.histogram_output.append(Output("range-slider-histogram-{}".format(variable), "figure"))
+            range_sliders.append(html.Div([
+                html.Pre(variable.split("_")[0][0].capitalize() + variable.split("_")[0][1:]),
+                dcc.Graph(id="range-slider-histogram-{}".format(variable)),
+                dcc.RangeSlider(id="range-slider-{}".format(variable), min=min, max=max, marks=marks, value=[min, max], tooltip={"placement": "bottom", "always_visible": True})
+                ]))
             
         inputs = {input_name: [Input("range-slider-{}".format(variable), "value") for variable in attributes]}
 
@@ -27,6 +36,30 @@ class RangeSlider(filter.Filter):
 
             return queries
 
+        def histogram(df, attribute):
+            fig = px.histogram(df, x=attribute)
+            
+            # legend
+            fig.update_layout(showlegend=False)
+
+            # Take up space
+            fig.update_layout(margin={"r": 5, "t": 0, "l": 5, "b": 0})
+
+            # x axis
+            fig.update_xaxes(visible=False, range=self.histogram_lims[attribute])
+
+            # y axis
+            fig.update_yaxes(visible=False)
+
+            # Take up less space
+            fig.update_layout(height=50)
+
+            return fig
+
+        def histogram_function(df):
+            return [histogram(df, attribute) for attribute in attributes]
+
+        self.histogram_figures = histogram_function
+
         super().__init__(range_sliders, inputs, conditions_func)
         pass
-

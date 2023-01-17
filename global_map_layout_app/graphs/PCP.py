@@ -79,14 +79,15 @@ def make_PCP(self, features, df, color='review_scores_rating'):
         PCP=dict(
 
         ),
+        margin={"r": 5, "t": 40, "l": 30, "b": 10},
         plot_bgcolor= 'white',
         paper_bgcolor= 'white',
-        title=dict(
-            color='black',
-            text='Principle Components Plot',
-            xanchor='center',
-            xref='contrainer'
-        ),
+        # title=dict(
+        #     color='black',
+        #     text='Principle Components Plot',
+        #     xanchor='center',
+        #     xref='contrainer'
+        # ),
         shapes=[
             {   "type": "rect",
                 "xref": "paper",

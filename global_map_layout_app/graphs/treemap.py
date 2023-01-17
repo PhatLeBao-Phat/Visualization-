@@ -10,9 +10,11 @@ def figure(self, filtered_data, clustering_key, color_map, path):
         "%{customdata[0]}",
         "%{customdata[1]}",
         "%{customdata[2]}",
-        "%{value} or %{percentParent:.1%}",
+        "%{value} or %{percentParent:.1%} of listings",
     ])
     fig.update_layout(margin = dict(t=50, l=25, r=25, b=25))
+
+    fig.update_layout(margin={"r": 5, "t": 30, "l": 5, "b": 0})
 
     fig.update_layout(
         hoverlabel=dict(
