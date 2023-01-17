@@ -52,7 +52,7 @@ reverse_DIMS = {
     'acceptance rate':'host_acceptance_rate_cleansed'
 }
 
-def make_PCP(features, df, color='review_scores_rating'):
+def make_PCP(self, features, df, color='review_scores_rating'):
     df_bnb = df.copy()
     customdata = list(
         zip(

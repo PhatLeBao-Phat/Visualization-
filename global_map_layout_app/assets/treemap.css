@@ -1,0 +1,9 @@
+#treemap-dropdowns-container {
+    display: grid;
+    grid-template-columns: repeat(3, max(100px) auto);
+}
+
+.treemap-dropdown-text {
+    text-align: center;
+    padding: 10%;
+}

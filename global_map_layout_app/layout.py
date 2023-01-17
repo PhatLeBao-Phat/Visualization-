@@ -1,48 +1,9 @@
-# # I need os for folder magic
-# import os
-# import pandas as pd
-# import numpy as np
-
-# # Creates the data folder
-# path_to_folder = os.getcwd()
-# folder_name = "Data"
-# path_to_new_folder = os.path.join(path_to_folder, folder_name)
-# if not os.path.exists (path_to_new_folder):
-#     os.mkdir(path_to_new_folder)
-#     print("\x1b[36m Created data folder \n")
-# else:
-#     print("\x1b[32m Data folder exists\n ")
-    
-# # Checks whether file exists
-# dataset_name = "airbnb_open_data.csv"
-# path_to_dataset = os.path.join(path_to_new_folder, dataset_name)
-
-# if os.path.exists (path_to_dataset):
-#     print("\x1b[32m Dataset {} is loaded in succesfully!".format(dataset_name))
-    
-#     # Load in dataset
-#     df_bnb = pd.read_csv(path_to_dataset)
-# else:
-#     print(path_to_dataset)
-#     print("\x1b[31m Dataset still needs to be put in the data folder!\n \n Go to canvas page of visualization and go to the datasets in files.\n Download the airbnb_open_data.csv and put it in the data folder.")
-
-# # Fast clean
-# df_bnb = df_bnb.replace("NaN", np.nan)
-# df_bnb = df_bnb.replace("nan", np.nan)
-
-# df_bnb = df_bnb.dropna(subset=["price", "review rate number", "room type", "neighbourhood group"])
-
-# def cleaning_price(price : str) -> int:
-#     return int(str(price).translate({ord('$'): None, ord(","): None}))
-
-# df_bnb["price"] = df_bnb["price"].apply(lambda x: cleaning_price(x))
-
 from figure import FigureManager, CustomFigure
 from graphs.map import figure as map_figure
 from graphs.treemap import figure as treemap_figure
 from filters.dropdown import DropDown
 from filters.rangeslider import RangeSlider
-import color
+from color import color
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -63,16 +24,28 @@ from graphs.PCP import DIMS, make_PCP
 
 import time
 
+import plotly.io as io
+io.templates.default = "simple_white"
+
 manager = FigureManager()
+
 map = CustomFigure("map", "1")
 map.assign_figure(map_figure)
 
 treemap = CustomFigure("treemap", "1")
 treemap.assign_figure(treemap_figure)
-treemap.showed = ["neighbourhood_group_cleansed", "room_type"]
+treemap.showed = ["neighbourhood_group_cleansed", "room_type", "price_cleansed", "bedrooms"]
+
+pcp = CustomFigure("pcp", "1")
+pcp.assign_figure(make_PCP)
 
 filter_dropdowns = DropDown(df_bnb, "parameters_filter_dropdown", ["neighbourhood_group_cleansed", "room_type"])
-filter_rangesliders = RangeSlider(df_bnb, "parameters_filter_rangesliders", ["price_cleansed", "review_scores_rating"], [100, 1])
+rangesliders_filters = [
+    "price_cleansed",
+    "review_scores_rating",
+    "bedrooms",
+]
+filter_rangesliders = RangeSlider(df_bnb, "parameters_filter_rangesliders", rangesliders_filters, [100, 1])
 
 app = Dash(__name__)
 
@@ -83,6 +56,26 @@ app.layout = html.Div([
     dcc.Store(id="memory-map"),
     map.html,
     html.Div([
+        html.Div([
+            html.Pre("First layer", className="treemap-dropdown-text"),
+            dcc.Dropdown(
+                value = "neighbourhood_group_cleansed",
+                id="treemap-layer-1",
+                className="treemap-dropdown"
+            ),
+            html.Pre("Second layer", className="treemap-dropdown-text"),
+            dcc.Dropdown(
+                value = "room_type",
+                id="treemap-layer-2",
+                className="treemap-dropdown"
+            ),
+            html.Pre("Third layer", className="treemap-dropdown-text"),
+            dcc.Dropdown(
+                value = "price_cleansed",
+                id="treemap-layer-3",
+                className="treemap-dropdown"
+            )
+        ], id="treemap-dropdowns-container"),
         treemap.html,
         html.Div([
             dcc.Dropdown(
@@ -92,8 +85,7 @@ app.layout = html.Div([
                 multi=True,
                 searchable=False,
             ),
-
-            dcc.Graph(id='PCP'),
+            pcp.html
         ]),
         html.Pre(id="print")
     ], id="visualization-container"),
@@ -117,19 +109,18 @@ app.layout = html.Div([
     ], id="menu-container", **{"data-menu-toggle": "collapsed"})
 ])
 
-# @app.callback(
-#     Output("print", "children"),
-#     Input("map-1", "selectedData"),
-#     Input("memory-map", "data"),
-# )
-# def to_print(selected, data):
+@app.callback(
+    Output("print", "children"),
+    Input("treemap-1", "clickData"),
+)
+def to_print(selected):
 
-#     return json.dumps(
-#         {
-#             # "selected": selected,
-#             "data": data
-#         }
-#         , indent=2)
+    return json.dumps(
+        {
+            # "selected": selected,
+            "data": selected
+        }
+        , indent=2)
 
 # Menu
 @app.callback(
@@ -156,6 +147,9 @@ def filter_data(parameters_filter_dropdown, parameters_filter_rangeslider):
 
     return filtered.to_dict('records')
 
+# Keep the treemap clickData the same
+
+
 # Store the data of clickData of treemap
 @app.callback(
     Output("memory-treemap", "data"),
@@ -180,7 +174,7 @@ def highlight_map(clicked, clustering_key, selected):
     except:
         return None
     
-    return ' & '.join(["({} == {})".format("`{}`".format(key), '"{}"'.format(elem)) for key, elem in zip(treemap.showed, derived) if elem != "(?)"])
+    return ' & '.join(["({} == {})".format("`{}`".format(key), '"{}"'.format(elem) if type(elem) == str else elem) for key, elem in zip(treemap.showed, derived) if elem != "(?)"])
 
 # Store the colormap
 @app.callback(
@@ -190,7 +184,7 @@ def highlight_map(clicked, clustering_key, selected):
 )
 def update_colormap(filtered_dict, clustering_key):
     filtered = pd.DataFrame.from_records(filtered_dict)
-    return color.color(filtered, clustering_key)
+    return color(filtered, clustering_key)
 
 # Store the selection on the map
 @app.callback(
@@ -214,6 +208,7 @@ def highlight_map(prev_selected, selected, clustering_key):
     # data_bool = (data["long"] > right_bottom[0]) & (data["lat"] < right_bottom[1]) & (data["long"] < left_top[0]) & (data["lat"] > left_top[1])
 
     return "((longitude > {}) & (latitude < {}) & (longitude < {}) & (latitude > {}))".format(right_bottom_y, right_bottom_x, left_top_y, left_top_x)
+
 
 @app.callback(
     map.output,
@@ -244,23 +239,40 @@ def update_map(filtered_dict, treemap_highlight, color_map, selected, clustering
     Input("memory-graphs", "data"),
     Input("memory-colormap", "data"),
     Input("memory-map", "data"),
-    Input('PCP-dropdown', 'value'),
+    Input("treemap-layer-1", "value"),
+    Input("treemap-layer-2", "value"),
+    Input("treemap-layer-3", "value"),
     Input("clustering-key", "value")
 )
-def update_map(filtered_dict, color_map, selected, dropdown_value, clustering_key = "neighbourhood group"):
+def update_map(filtered_dict, color_map, selected, v1, v2, v3, clustering_key = "neighbourhood group"):
     filtered = pd.DataFrame.from_records(filtered_dict)
-    features = [DIMS[feature] for feature in dropdown_value]
 
     if selected is not None:
         filtered = filtered.query(selected)
 
     time.sleep(1)
     return (
-        treemap.figure(filtered, clustering_key, color_map, dropdown_value)
+        treemap.figure(filtered, clustering_key, color_map, path = [v1, v2, v3])
     )
 
 @app.callback(
-    Output('PCP', 'figure'),
+    Output("treemap-layer-1", "options"),
+    Output("treemap-layer-2", "options"),
+    Output("treemap-layer-3", "options"),
+    Input("treemap-layer-1", "value"),
+    Input("treemap-layer-2", "value"),
+    Input("treemap-layer-3", "value"),
+)
+def update_treemap_options(v1, v2, v3):
+    options = treemap.showed.copy()
+    return (
+        [option for option in options if v2 != option if v3 != option],
+        [option for option in options if v1 != option if v3 != option],
+        [option for option in options if v1 != option if v2 != option],
+    )
+
+@app.callback(
+    pcp.output,
     Input("memory-graphs", "data"),
     Input("memory-treemap", "data"),
     Input("memory-map", "data"),
@@ -273,28 +285,15 @@ def update_map(filtered_dict, treemap_highlight, selected, dropdown_value, clust
 
     if selected is not None:
         filtered = filtered.query(selected)
-        # filtered.loc[filtered.query(selected).index, clustering_key] = "selected"
 
     if treemap_highlight is not None:
-        # filtered.loc[filtered.query(treemap_highlight).index, clustering_key] = "highlighted"
         filtered = filtered.query(treemap_highlight)
 
     time.sleep(1)
     return (
-        make_PCP(features, filtered)#, clustering_key)
+        pcp.figure(features, filtered)#, clustering_key)
+        # make_PCP(features, filtered)#, clustering_key)
     )
-
-# # Callback function 
-# @app.callback(
-#     Output('PCP', 'figure'),
-#     Input('PCP-dropdown', 'value'),
-# )
-# def update_PCP(dropdown_value):
-#     features = [DIMS[feature] for feature in dropdown_value]
-    
-#     # Plot the PCP
-#     fig = make_PCP(features, df_bnb)
-#     return fig 
 
 app.run_server(debug=True)
 

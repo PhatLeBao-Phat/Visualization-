@@ -97,6 +97,12 @@ def host_response_rate_clean(df):
 
     return df_copy
 
+def price_clean(df):
+    df_copy = df.copy()
+    df_copy = df_copy[df_copy["price_cleansed"] <= 2000]
+
+    return df_copy
+
 # df_bnb = get_custom_df(df_bnb, FEATURES)
 # df_bnb = test_data(df_bnb)
 df_bnb = pd.read_pickle(PATH)
@@ -104,5 +110,6 @@ df_bnb = clean_host_is_superhost_cleansed(df_bnb)
 df_bnb = tree_map_preprocessing(df_bnb)
 df_bnb = host_response_rate_clean(df_bnb)
 df_bnb = host_acceptance_rate_clean(df_bnb)
+df_bnb = price_clean(df_bnb)
 df_bnb = get_custom_df(df_bnb, FEATURES)
 

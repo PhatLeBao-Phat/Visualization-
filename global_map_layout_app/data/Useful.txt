@@ -4,7 +4,7 @@ The one on Kaggle is literally the one we use for this project without extenstio
 
 - Location: 
     latitude 
-    longtitude
+    longitude
 
 - neighbourhood:
     neighbourhood                   text    combined 
