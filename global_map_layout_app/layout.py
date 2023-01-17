@@ -155,9 +155,12 @@ def filter_data(parameters_filter_dropdown, parameters_filter_rangeslider):
     Output("memory-treemap", "data"),
     Input("treemap-1", "clickData"),
     Input("clustering-key", "value"),
-    Input("map-1", "selectedData")
+    Input("map-1", "selectedData"),
+    Input("treemap-layer-1", "value"),
+    Input("treemap-layer-2", "value"),
+    Input("treemap-layer-3", "value"),
 )
-def highlight_map(clicked, clustering_key, selected):
+def highlight_map(clicked, clustering_key, selected, *args):
     if clicked is None:
         return None
 
@@ -174,7 +177,9 @@ def highlight_map(clicked, clustering_key, selected):
     except:
         return None
     
-    return ' & '.join(["({} == {})".format("`{}`".format(key), '"{}"'.format(elem) if type(elem) == str else elem) for key, elem in zip(treemap.showed, derived) if elem != "(?)"])
+    print(' & '.join(["({} == {})".format("`{}`".format(key), '"{}"'.format(elem) if type(elem) == str else elem) for key, elem in zip(args, derived) if elem != "(?)"]))
+
+    return ' & '.join(["({} == {})".format("`{}`".format(key), '"{}"'.format(elem) if type(elem) == str else elem) for key, elem in zip(args, derived) if elem != "(?)"])
 
 # Store the colormap
 @app.callback(
@@ -269,7 +274,7 @@ def update_treemap_options(v1, v2, v3):
         [option for option in options if v2 != option if v3 != option],
         [option for option in options if v1 != option if v3 != option],
         [option for option in options if v1 != option if v2 != option],
-    )
+)
 
 @app.callback(
     pcp.output,
