@@ -39,6 +39,8 @@ treemap.showed = ["neighbourhood_group_cleansed", "room_type", "price_cleansed",
 pcp = CustomFigure("pcp", "1")
 pcp.assign_figure(make_PCP)
 
+initial_clustering_key = "neighbourhood_group_cleansed"
+
 filter_dropdowns = DropDown(df_bnb, "parameters_filter_dropdown", ["neighbourhood_group_cleansed", "room_type"])
 rangesliders_filters = [
     "price_cleansed",
@@ -83,7 +85,7 @@ app.layout = html.Div([
         html.Div([
             dcc.Dropdown(
                 id='PCP-dropdown',
-                options=['accuracy', 'checkin', 'cleanliness', 'communication', 'location', 'response rate', 'acceptance rate'],
+                options=['accuracy', 'checkin', 'cleanliness', 'communication', 'location', 'response rate', 'acceptance rate', "neighbourhood_group_cleansed"],
                 value=['accuracy', 'communication', 'location'],
                 multi=True,
                 searchable=False,
@@ -205,15 +207,10 @@ def highlight_map(prev_selected, selected, clustering_key):
     if selected is None:
         return prev_selected
 
-    # # Remove selection when color change
-    # if ctx.triggered[0]["prop_id"].split(".")[0] == "clustering-key":
-    #     return None
-
     right_bottom_y = selected["range"]["mapbox"][0][0]
     right_bottom_x = selected["range"]["mapbox"][0][1]
     left_top_y = selected["range"]["mapbox"][1][0]
     left_top_x = selected["range"]["mapbox"][1][1]
-    # data_bool = (data["long"] > right_bottom[0]) & (data["lat"] < right_bottom[1]) & (data["long"] < left_top[0]) & (data["lat"] > left_top[1])
 
     return "((longitude > {}) & (latitude < {}) & (longitude < {}) & (latitude > {}))".format(right_bottom_y, right_bottom_x, left_top_y, left_top_x)
 
@@ -226,7 +223,7 @@ def highlight_map(prev_selected, selected, clustering_key):
     Input("memory-map", "data"),
     Input("clustering-key", "value"),
 )
-def update_map(filtered_dict, treemap_highlight, color_map, selected, clustering_key = "neighbourhood group"):
+def update_map(filtered_dict, treemap_highlight, color_map, selected, clustering_key = initial_clustering_key):
     filtered = pd.DataFrame.from_records(filtered_dict)
 
     if selected is not None:
@@ -252,7 +249,7 @@ def update_map(filtered_dict, treemap_highlight, color_map, selected, clustering
     Input("treemap-layer-3", "value"),
     Input("clustering-key", "value")
 )
-def update_map(filtered_dict, color_map, selected, v1, v2, v3, clustering_key = "neighbourhood group"):
+def update_map(filtered_dict, color_map, selected, v1, v2, v3, clustering_key = initial_clustering_key):
     filtered = pd.DataFrame.from_records(filtered_dict)
 
     if selected is not None:
@@ -282,12 +279,13 @@ def update_treemap_options(v1, v2, v3):
 @app.callback(
     pcp.output,
     Input("memory-graphs", "data"),
+    Input("memory-colormap", "data"),
     Input("memory-treemap", "data"),
     Input("memory-map", "data"),
     Input('PCP-dropdown', 'value'),
     Input("clustering-key", "value")
 )
-def update_map(filtered_dict, treemap_highlight, selected, dropdown_value, clustering_key = "neighbourhood group"):
+def update_map(filtered_dict, color_map, treemap_highlight, selected, dropdown_value, clustering_key = initial_clustering_key):
     filtered = pd.DataFrame.from_records(filtered_dict)
     features = [DIMS[feature] for feature in dropdown_value]
 
@@ -299,7 +297,7 @@ def update_map(filtered_dict, treemap_highlight, selected, dropdown_value, clust
 
     time.sleep(1)
     return (
-        pcp.figure(features, filtered)#, clustering_key)
+        pcp.figure(features, filtered, color_map, clustering_key)
         # make_PCP(features, filtered)#, clustering_key)
     )
 
@@ -321,11 +319,6 @@ def update_map(filtered_dict, treemap_highlight, selected):
     return filter_rangesliders.histogram_figures(filtered)
 
 app.run_server(debug=True)
-
-value = "Brooklyn"
-df_bnb.loc[df_bnb.query('`neighbourhood group` == @value').index, "neighbourhood group"] = "highlighted"
-print(df_bnb["neighbourhood group"].unique())
-print(df_bnb)
 
 
 

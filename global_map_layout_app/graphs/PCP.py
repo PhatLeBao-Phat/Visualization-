@@ -1,6 +1,7 @@
 import pandas as pd 
 import numpy as np 
 import plotly.graph_objects as go 
+import plotly.express as px
 
 from data.data_helpers import PATH, FEATURES, df_bnb
 
@@ -52,7 +53,7 @@ reverse_DIMS = {
     'acceptance rate':'host_acceptance_rate_cleansed'
 }
 
-def make_PCP(self, features, df, color='review_scores_rating'):
+def make_PCP(self, features, df, color_map, color='review_scores_rating'):
     df_bnb = df.copy()
     customdata = list(
         zip(
@@ -65,8 +66,10 @@ def make_PCP(self, features, df, color='review_scores_rating'):
     PCP_figure = dict(
         type='parcoords',
         line=dict(
-            color=df_bnb[color],
-            colorscale='Electric',
+            color=df_bnb[color].astype('category').cat.codes,
+            colorscale=[[key, color] for key, color in zip(list(df_bnb[color].astype('category').cat.codes.unique()), px.colors.qualitative.G10)],
+            # colorscale='Electric',
+            # colorscale = {0: "blue", 1: "green", 2: "yellow", 3: "red", 4: "black"},
             showscale=True,
 
         ),
@@ -100,8 +103,6 @@ def make_PCP(self, features, df, color='review_scores_rating'):
                 "visible": True
             }
         ],
-        # margin=dict(l=5, t=30, b=20, r=5),
-        # height=300,
         showlegend=True,
         hovermode="x",
     )

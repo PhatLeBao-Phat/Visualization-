@@ -16,7 +16,7 @@
 }
 
 #menu-filter-container {
-    background-color: grey;
+    box-shadow: 0rem 0rem 5rem rgba(0 0 0 / 35%);
 }
 
 #menu-button {

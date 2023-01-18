@@ -54,6 +54,12 @@ class RangeSlider(filter.Filter):
             # Take up less space
             fig.update_layout(height=50)
 
+            # Make background transparent
+            fig.update_layout(
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)'     
+            )
+
             return fig
 
         def histogram_function(df):
