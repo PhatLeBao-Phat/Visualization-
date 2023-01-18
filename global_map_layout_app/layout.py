@@ -24,9 +24,6 @@ from graphs.PCP import DIMS, make_PCP
 
 import time
 
-import plotly.io as io
-io.templates.default = "simple_white"
-
 manager = FigureManager()
 
 map = CustomFigure("map", "1")
@@ -85,7 +82,7 @@ app.layout = html.Div([
         html.Div([
             dcc.Dropdown(
                 id='PCP-dropdown',
-                options=['accuracy', 'checkin', 'cleanliness', 'communication', 'location', 'response rate', 'acceptance rate', "neighbourhood_group_cleansed"],
+                options=['accuracy', 'checkin', 'cleanliness', 'communication', 'location', 'response rate', 'acceptance rate'],
                 value=['accuracy', 'communication', 'location'],
                 multi=True,
                 searchable=False,
@@ -272,9 +269,9 @@ def update_treemap_options(v1, v2, v3):
     Input('PCP-dropdown', 'value'),
     Input("clustering-key", "value")
 )
-def update_map(filtered_dict, color_map, treemap_highlight, selected, dropdown_value, clustering_key = initial_clustering_key):
+def update_map(filtered_dict, color_map, treemap_highlight, selected, features, clustering_key = initial_clustering_key):
     filtered = pd.DataFrame.from_records(filtered_dict)
-    features = [DIMS[feature] for feature in dropdown_value]
+    # features = [DIMS[feature] for feature in features]
 
     if selected is not None:
         filtered = filtered.query(selected)
@@ -285,7 +282,6 @@ def update_map(filtered_dict, color_map, treemap_highlight, selected, dropdown_v
     time.sleep(1)
     return (
         pcp.figure(features, filtered, color_map, clustering_key)
-        # make_PCP(features, filtered)#, clustering_key)
     )
 
 @app.callback(
