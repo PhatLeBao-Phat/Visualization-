@@ -3,7 +3,7 @@ import plotly.express as px
 import filter
 
 class RangeSlider(filter.Filter):
-    def __init__(self, data, input_name: str, attributes : list[str], step: list[int, int], names : dict = {}) -> None:
+    def __init__(self, data, input_name: str, attributes : list[str]) -> None:
         range_sliders = []
         self.histogram_output = []
         self.histogram_lims = {}

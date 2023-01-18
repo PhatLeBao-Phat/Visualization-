@@ -66,12 +66,8 @@ def make_PCP(self, features, df, color_map, color='review_scores_rating'):
     PCP_figure = dict(
         type='parcoords',
         line=dict(
-            color=df_bnb[color].astype('category').cat.codes,
-            colorscale=[[key, color] for key, color in zip(list(df_bnb[color].astype('category').cat.codes.unique()), px.colors.qualitative.G10)],
-            # colorscale='Electric',
-            # colorscale = {0: "blue", 1: "green", 2: "yellow", 3: "red", 4: "black"},
+            color=df_bnb["neighbourhood_group_cleansed"],
             showscale=True,
-
         ),
         dimensions=features,
         unselected=dict(line = dict(color = 'gray', opacity = 0.3)),

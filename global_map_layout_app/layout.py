@@ -47,7 +47,7 @@ rangesliders_filters = [
     "review_scores_rating",
     "bedrooms",
 ]
-filter_rangesliders = RangeSlider(df_bnb, "parameters_filter_rangesliders", rangesliders_filters, [100, 1])
+filter_rangesliders = RangeSlider(df_bnb, "parameters_filter_rangesliders", rangesliders_filters)
 
 app = Dash(__name__)
 
@@ -152,37 +152,27 @@ def filter_data(parameters_filter_dropdown, parameters_filter_rangeslider):
 
     return filtered.to_dict('records')
 
-# Keep the treemap clickData the same
-
-
 # Store the data of clickData of treemap
 @app.callback(
     Output("memory-treemap", "data"),
     Input("treemap-1", "clickData"),
     Input("clustering-key", "value"),
-    Input("map-1", "selectedData"),
     Input("treemap-layer-1", "value"),
     Input("treemap-layer-2", "value"),
     Input("treemap-layer-3", "value"),
 )
-def highlight_map(clicked, clustering_key, selected, *args):
+def highlight_map(clicked, clustering_key, *args):
     if clicked is None:
         return None
 
-    # # Remove selection when selected
-    # if selected is not None:
-    #     return None
-
     # Remove selection when color change
-    if ctx.triggered[0]["prop_id"].split(".")[0] == "clustering-key":
+    if ctx.triggered[0]["prop_id"].split(".")[0] in ["clustering-key", "treemap-layer-1", "treemap-layer-2", "treemap-layer-3"]:
         return None
 
     try:
         derived = clicked["points"][0]["customdata"]
     except:
         return None
-    
-    print(' & '.join(["({} == {})".format("`{}`".format(key), '"{}"'.format(elem) if type(elem) == str else elem) for key, elem in zip(args, derived) if elem != "(?)"]))
 
     return ' & '.join(["({} == {})".format("`{}`".format(key), '"{}"'.format(elem) if type(elem) == str else elem) for key, elem in zip(args, derived) if elem != "(?)"])
 
@@ -200,10 +190,9 @@ def update_colormap(filtered_dict, clustering_key):
 @app.callback(
     Output("memory-map", "data"),
     Input("memory-map", "data"),
-    Input("map-1", "selectedData"),
-    Input("clustering-key", "value")
+    Input("map-1", "selectedData")
 )
-def highlight_map(prev_selected, selected, clustering_key):
+def highlight_map(prev_selected, selected):
     if selected is None:
         return prev_selected
 
@@ -228,10 +217,8 @@ def update_map(filtered_dict, treemap_highlight, color_map, selected, clustering
 
     if selected is not None:
         filtered = filtered.query(selected)
-        # filtered.loc[filtered.query(selected).index, clustering_key] = "selected"
 
     if treemap_highlight is not None:
-        # filtered.loc[filtered.query(treemap_highlight).index, clustering_key] = "highlighted"
         filtered = filtered.query(treemap_highlight)
 
     time.sleep(1)
