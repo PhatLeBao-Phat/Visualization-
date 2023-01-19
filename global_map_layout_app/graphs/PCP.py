@@ -10,43 +10,44 @@ DIMS = {
         label = 'accuracy',
         values = df_bnb['review_scores_accuracy'],
         range=[0, 5],
+        constraintrange=[0, 5],
     ),
     'cleanliness' : go.parcoords.Dimension(
         label = 'cleanliness',
         values = df_bnb['review_scores_cleanliness'],
         range=[0, 5],
+        constraintrange=[0, 5],
     ),
     'checkin' : go.parcoords.Dimension(
         label = 'checkin',
         values = df_bnb['review_scores_checkin'],
         range=[0, 5],
+        constraintrange=[0, 5],
     ),
     'communication' : go.parcoords.Dimension(
         label = 'communication',
         values = df_bnb['review_scores_communication'],
         range=[0, 5],
+        constraintrange=[0, 5],
     ),
     'location' : go.parcoords.Dimension(
         label = 'location',
         values = df_bnb['review_scores_location'],
         range=[0, 5],
+        constraintrange=[0, 5],
     ),
     'response rate' : go.parcoords.Dimension(
         label = 'response rate (%)',
         values = df_bnb['host_response_rate_cleansed'],
         range=[0, 100],
+        constraintrange=[0, 100],
     ),
     'acceptance rate' : go.parcoords.Dimension(
         label = 'acceptance rate (%)',
         values = df_bnb['host_acceptance_rate_cleansed'],
         range=[0, 100],
+        constraintrange=[0, 100],
     ),
-    # "neigbourhood group" : go.parcoords.Dimension(
-    #     label = "neighbourhood group",
-    #     values = df_bnb["dummy"],
-    #     tickvals = dfg["dummy"],
-    #     ticktext = dfg[dummify]
-    # )
 }
 
 reverse_DIMS = {
@@ -60,20 +61,35 @@ reverse_DIMS = {
 }
 
 # def make_PCP(self, features, filtered, color_map, color):
-#     print(color)
+#     # Make dummies
+#     dummify = color
+#     dfg = pd.DataFrame({dummify:df_bnb[dummify].unique()})
+#     dfg['dummy'] = dfg.index
+#     filtered = pd.merge(filtered, dfg, on = dummify, how='left')
 
-    # dummify = "bedrooms"
-    # dfg = pd.DataFrame({dummify:filtered[dummify].unique()})
-    # dfg['dummy'] = dfg.index
-    # filtered = pd.merge(filtered, dfg, on = dummify, how='left')
+#     # Color map into list
+#     color_list = []
+#     for key, value in color_map.items():
+#         if key in list(filtered[color].unique()):
+#             color_list.append(value)
+
+#     # Makes sure when only one category it does not give an error
+#     if len(color_list) == 1:
+#         color_list.append(color_list[0])
 
 #     PCP_figure = dict(
 #         type='parcoords',
 #         line=dict(
+#             # Put in dummy for categorical data 
 #             color=filtered["dummy"],
-#             colorscale=[[1, "rgb(0,0,0)"], [10, "rgb(100, 100, 100)"]]
+
+#             # Only put in the color for each attributes present
+#             colorscale=color_list
 #         ),
+#         # Set the parallel coords featured
 #         dimensions=features,
+
+#         # When selection, not selected
 #         unselected=dict(line = dict(color = 'gray', opacity = 0.3))
 #     )
 
@@ -81,9 +97,14 @@ reverse_DIMS = {
 #         PCP=dict(
 
 #         ),
+#         # Less white space
 #         margin={"r": 5, "t": 40, "l": 30, "b": 10},
+
+#         # Make background white
 #         plot_bgcolor= 'white',
 #         paper_bgcolor= 'white',
+
+#         # The rest
 #         shapes=[
 #             {   "type": "rect",
 #                 "xref": "paper",
@@ -99,11 +120,13 @@ reverse_DIMS = {
 #         showlegend=True,
 #         hovermode="x",
 #     )
-    
+
+#     # Put into a figure
 #     figure = dict(
 #         data=[PCP_figure], 
 #         layout=layout,
 #     )
+
 #     return figure 
 
 def make_PCP(self, features, filtered, color_map, color):
@@ -115,8 +138,15 @@ def make_PCP(self, features, filtered, color_map, color):
     dfg['dummy'] = dfg.index
     filtered = pd.merge(filtered, dfg, on = dummify, how='left')
 
-    # Color map into list [STIIL NEEDS TO BE FIXED]
-    color_list = [color_map[elem] for elem in filtered[color].unique()]
+    # Color map into list
+    color_list = []
+    for key, value in color_map.items():
+        if key in list(filtered[color].unique()):
+            color_list.append(value)
+
+    # Makes sure when only one category it does not give an error
+    if len(color_list) == 1:
+        color_list.append(color_list[0])
 
     fig = px.parallel_coordinates(
         # Set the data
@@ -129,14 +159,11 @@ def make_PCP(self, features, filtered, color_map, color):
         color=filtered["dummy"],
 
         # Only put in the color for each attributes present
-        color_continuous_scale=color_list,
-
-        # # Make color the same
-        # range_color=[filtered["dummy"].min(), filtered["dummy"].max()]
+        color_continuous_scale=color_list
     )
 
     # Remove color scale
-    # fig.update_coloraxes(showscale=False)
+    fig.update_coloraxes(showscale=False)
 
     fig.update_layout(
         # Less white space

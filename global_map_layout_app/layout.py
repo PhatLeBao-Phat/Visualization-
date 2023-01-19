@@ -289,8 +289,9 @@ def update_map(filtered_dict, color_map, treemap_highlight, selected, features, 
     Input("memory-graphs", "data"),
     Input("memory-treemap", "data"),
     Input("memory-map", "data"),
+    Input("clustering-key", "value")
 )
-def update_map(filtered_dict, treemap_highlight, selected):
+def update_map(filtered_dict, treemap_highlight, selected, clustering = initial_clustering_key):
     filtered = pd.DataFrame.from_records(filtered_dict)
 
     if selected is not None:
@@ -299,7 +300,7 @@ def update_map(filtered_dict, treemap_highlight, selected):
     if treemap_highlight is not None:
         filtered = filtered.query(treemap_highlight)
 
-    return filter_rangesliders.histogram_figures(filtered)
+    return filter_rangesliders.histogram_figures(filtered, clustering)
 
 app.run_server(debug=True)
 
