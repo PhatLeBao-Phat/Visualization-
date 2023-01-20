@@ -138,15 +138,19 @@ def make_PCP(self, features, filtered, color_map, color):
     dfg['dummy'] = dfg.index
     filtered = pd.merge(filtered, dfg, on = dummify, how='left')
 
-    # Color map into list
-    color_list = []
-    for key, value in color_map.items():
-        if key in list(filtered[color].unique()):
-            color_list.append(value)
+    # If it is a sequential color_map then skip the code underneath
+    if type(color_map) != list:
+        # Color map into list
+        color_list = []
+        for key, value in color_map.items():
+            if key in list(filtered[color].unique()):
+                color_list.append(value)
 
-    # Makes sure when only one category it does not give an error
-    if len(color_list) == 1:
-        color_list.append(color_list[0])
+        # Makes sure when only one category it does not give an error
+        if len(color_list) == 1:
+            color_list.append(color_list[0])
+    else:
+        color_list = color_map
 
     fig = px.parallel_coordinates(
         # Set the data

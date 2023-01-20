@@ -24,52 +24,90 @@ from graphs.PCP import DIMS, make_PCP
 
 import time
 
+# Create manager for the figures. Keeps track of the all the ids, inputs and outputs added
 manager = FigureManager()
 
+# Adds figure map
 map = CustomFigure("map", "1")
+# Assign the figure that generates map
 map.assign_figure(map_figure)
 
+# Adds figure treemap
 treemap = CustomFigure("treemap", "1")
+# Assign the figure that generates treemap
 treemap.assign_figure(treemap_figure)
+# Assign what can be selected as options
 treemap.showed = ["neighbourhood_group_cleansed", "room_type", "price_cleansed", "bedrooms"]
+# Generates dropdown (dropdowns are currently hardcoded)
 
+# Adds figure PCP
 pcp = CustomFigure("pcp", "1")
+# Assign the figure that generates PCP
 pcp.assign_figure(make_PCP)
 
+# The general clustering_key for all visualizations (figures)
 initial_clustering_key = "neighbourhood_group_cleansed"
 
-filter_dropdowns = DropDown(df_bnb, "parameters_filter_dropdown", ["neighbourhood_group_cleansed", "room_type"])
+# Generate a dropdown for each attribute mentioned
+dropdown_filters = [
+    "neighbourhood_group_cleansed",
+    "room_type"
+]
+# Generates multi-choice dropdown menus
+filter_dropdowns = DropDown(df_bnb, "parameters_filter_dropdown", dropdown_filters)
+
+# Generate a rangeslider for each attribute mentioned
 rangesliders_filters = [
     "price_cleansed",
     "review_scores_rating",
     "bedrooms",
 ]
+# Generates rangesliders
 filter_rangesliders = RangeSlider(df_bnb, "parameters_filter_rangesliders", rangesliders_filters)
 
+# The app from Dash
 app = Dash(__name__)
 
+# The layout that will be generated in html
 app.layout = html.Div([
+    # Stores data filtered by all the filters
     dcc.Store(id="memory-graphs"),
+    # Stores condition which to filter on based on what is clicked in treemap
     dcc.Store(id="memory-treemap"),
-    dcc.Store(id="memory-colormap"),
+    # Stores the colormap from module color based on clustering_key
+    dcc.Store(id="memory-colormap"), 
+    # Stores condition which to filter on based on what is selected in map
     dcc.Store(id="memory-map"),
+    
+    # The html of map [Contains: Loading and graph]
     map.html,
+
+    # The container for the treemap, PCP and title
     html.Div([
+        # The title of our project
         html.Pre("AirBnb Hosts - JBI100 Dashboard", style={"font-size": 60, "text-align": "center", "padding": "20px"}),
+        
+        # Treemap container
         html.Div([
+            # Container for all the dropdowns for each layer
             html.Div([
+                # First layer
                 html.Pre("First layer", className="treemap-dropdown-text"),
                 dcc.Dropdown(
                     value = "neighbourhood_group_cleansed",
                     id="treemap-layer-1",
                     className="treemap-dropdown"
                 ),
+
+                # Second layer
                 html.Pre("Second layer", className="treemap-dropdown-text"),
                 dcc.Dropdown(
                     value = "room_type",
                     id="treemap-layer-2",
                     className="treemap-dropdown"
                 ),
+
+                # Third layer
                 html.Pre("Third layer", className="treemap-dropdown-text"),
                 dcc.Dropdown(
                     value = "bedrooms",
@@ -77,9 +115,14 @@ app.layout = html.Div([
                     className="treemap-dropdown"
                 )
             ], id="treemap-dropdowns-container"),
+
+            # The html of treemap [Contains: Loading and graph]
             treemap.html,
         ]),
+
+        # PCP container
         html.Div([
+            # Multi variable dropdown which attribute to display in PCP
             dcc.Dropdown(
                 id='PCP-dropdown',
                 options=['accuracy', 'checkin', 'cleanliness', 'communication', 'location', 'response rate', 'acceptance rate'],
@@ -87,22 +130,43 @@ app.layout = html.Div([
                 multi=True,
                 searchable=False,
             ),
+
+            # The html of pcp [Contains: Loading and graph]
             pcp.html
         ]),
-        # html.Pre(id="print")
     ], id="visualization-container"),
+
+    # Filter menu container
     html.Div([
+
+        # Filters container
         html.Div([
+            # The name
+            html.Pre("Filter Menu", style={"font-size": 30, "text-align": "center"}),
+
+            # Clustering_key dropdown
             dcc.Dropdown(
                 df_bnb.columns,
                 "neighbourhood_group_cleansed",
                 id="clustering-key"
             ),
+
+            # All the other before mentioned multi dropdowns
             html.Div(filter_dropdowns.children),
+
+            # All the other before mentioned rangesliders
             html.Div(filter_rangesliders.children),
+
+            # Button to turn off tourist attractions
+            html.Pre("Show tourist attractions:"),
+            html.Button(id="menu-filter-tourist-attractions", n_clicks=0, **{"data-menu-tourist-attractions": "True"})
         ], id="menu-filter-container"),
+
+        # Menu Button container
         html.Div([
+            # The Button to toggle the filter menu on or off
             html.Button(
+                # Contains icons for open and closed. Open gives the three bars and closed gives a cross
                 [html.I(className="open fa-solid fa-bars-staggered fa-2xl"), html.I(className="close fa-solid fa-xmark fa-2xl")],
                 id="menu-button",
                 n_clicks=0
@@ -110,19 +174,6 @@ app.layout = html.Div([
         ], id="menu-button-container")
     ], id="menu-container", **{"data-menu-toggle": "collapsed"})
 ])
-
-# @app.callback(
-#     Output("print", "children"),
-#     Input("treemap-1", "clickData"),
-# )
-# def to_print(selected):
-
-#     return json.dumps(
-#         {
-#             # "selected": selected,
-#             "data": selected
-#         }
-#         , indent=2)
 
 # Menu
 @app.callback(
@@ -200,6 +251,15 @@ def highlight_map(prev_selected, selected):
 
     return "((longitude > {}) & (latitude < {}) & (longitude < {}) & (latitude > {}))".format(right_bottom_y, right_bottom_x, left_top_y, left_top_x)
 
+# Menu button to show tourist attraction
+@app.callback(
+    Output("menu-filter-tourist-attractions", "data-menu-tourist-attractions"),
+    Input("menu-filter-tourist-attractions", "n_clicks"),
+    Input("menu-filter-tourist-attractions", "data-menu-tourist-attractions"),
+    prevent_initial_call=True
+)
+def update_tourist_attractions(n_clicks, boolean):
+    return "False" if boolean == "True" else "True"
 
 @app.callback(
     map.output,
@@ -207,9 +267,10 @@ def highlight_map(prev_selected, selected):
     Input("memory-treemap", "data"),
     Input("memory-colormap", "data"),
     Input("memory-map", "data"),
+    Input("menu-filter-tourist-attractions", "data-menu-tourist-attractions"), 
     Input("clustering-key", "value"),
 )
-def update_map(filtered_dict, treemap_highlight, color_map, selected, clustering_key = initial_clustering_key):
+def update_map(filtered_dict, treemap_highlight, color_map, selected, tourist_boolean, clustering_key = initial_clustering_key):
     filtered = pd.DataFrame.from_records(filtered_dict)
 
     if selected is not None:
@@ -220,7 +281,7 @@ def update_map(filtered_dict, treemap_highlight, color_map, selected, clustering
 
     time.sleep(1)
     return (
-        map.figure(filtered, clustering_key, color_map)
+        map.figure(filtered, clustering_key, color_map, tourist_boolean)
     )
 
 @app.callback(

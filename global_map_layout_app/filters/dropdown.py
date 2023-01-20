@@ -1,5 +1,5 @@
 import filter
-from dash import dcc, Input
+from dash import dcc, Input, html
 
 class DropDown(filter.Filter):
     def __init__(self, data, input_name: str, attributes: list) -> None:
@@ -7,7 +7,10 @@ class DropDown(filter.Filter):
         for attribute in attributes:
             unique = data[attribute].dropna().unique()
             if len(list(unique)) < 30:
-                dropdowns.append(dcc.Dropdown(unique, unique, id="dropdown-{}".format(attribute), multi=True))
+                dropdowns.append(html.Div([
+                    html.Pre(attribute.split("_")[0][0].capitalize() + attribute.split("_")[0][1:]),
+                    dcc.Dropdown(unique, unique, id="dropdown-{}".format(attribute), multi=True)
+                    ]))
 
         inputs = {input_name: [Input("dropdown-{}".format(variable), "value") for variable in attributes]}
 

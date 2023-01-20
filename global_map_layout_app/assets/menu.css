@@ -16,7 +16,19 @@
 }
 
 #menu-filter-container {
+    background-color: rgba(227, 227, 227, 0.323);
+    padding-left: 1rem;
+    padding-right: 1rem;
     box-shadow: 0rem 0rem 5rem rgba(0 0 0 / 35%);
+}
+
+#menu-filter-container > div > div {
+    padding-top: 10px;
+}
+
+#menu-filter-container pre {
+    padding-top: 10px;
+    font-weight: bold;
 }
 
 #menu-button {
@@ -77,9 +89,39 @@
 }
 
 #menu-container[data-menu-toggle="collapsed"] {
-    transform: translateX(-30rem)
+    transform: translateX(-31rem)
 }
 
 #menu-container[data-menu-toggle="appear"] {
     transform: translateX(0)
+}
+
+#menu-filter-tourist-attractions {
+    width: 5rem;
+    height: 5rem;
+    margin-top: 7px;
+    background-color: lightgreen;
+    border: none;
+    outline: none;
+    position: relative;
+    border-radius: 5rem;
+    box-shadow: 0rem 0rem 5rem rgba(0 0 0 / 35%);
+    cursor: pointer;
+    transition: transform, background-color;
+    transition-timing-function: ease;
+    transition-duration: 400ms;
+}
+
+#menu-filter-tourist-attractions[data-menu-tourist-attractions="False"] {
+    background-color: rgb(240, 124, 124);
+}
+
+#menu-filter-tourist-attractions:hover {
+    transform: scale(1.10);
+
+}
+
+#menu-filter-tourist-attractions:active {
+    transform: scale(1);
+    background-color: whitesmoke;
 }
