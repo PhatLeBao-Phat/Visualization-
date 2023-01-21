@@ -31,7 +31,7 @@
     font-weight: bold;
 }
 
-#menu-button {
+.menu-button {
     width: 5rem;
     height: 5rem;
     margin: 2.5rem;
@@ -60,12 +60,36 @@
     transition-duration: 400ms;
 }
 
-#menu-button:hover {
-    transform: scale(1.10);
-
+#menu-reset-button {
+    background-color: rgb(171, 228, 171);
 }
 
-#menu-button:active {
+#menu-reset-button > i{
+    opacity: 1;
+    color: white;
+    transition: opacity;
+    transition-timing-function: ease;
+    transition-duration: 400ms;
+}
+
+#menu-reset-button:hover > i{
+    animation: rotation 2s infinite ease-out;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0);
+    }
+    100% {
+        transform: rotate(359deg);
+    }
+}
+
+.menu-button:hover {
+    transform: scale(1.10);
+}
+
+.menu-button:active {
     transform: scale(1);
     background-color: whitesmoke;
 }

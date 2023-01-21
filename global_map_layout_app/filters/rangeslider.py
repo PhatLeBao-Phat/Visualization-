@@ -36,8 +36,12 @@ class RangeSlider(filter.Filter):
 
             return queries
 
-        def histogram(df, attribute, clustering):
-            fig = px.histogram(df, x=attribute, color=df[clustering])
+        def histogram(df, attribute, clustering, color_map):
+            if type(color_map) != list:
+                fig = px.histogram(df, x=attribute, color=df[clustering], color_discrete_map=color_map)
+            else:
+                fig = px.histogram(df, x=attribute)
+
             
             # legend
             fig.update_layout(showlegend=False)
@@ -62,8 +66,8 @@ class RangeSlider(filter.Filter):
 
             return fig
 
-        def histogram_function(df, clustering):
-            return [histogram(df, attribute, clustering) for attribute in attributes]
+        def histogram_function(df, clustering, color_map):
+            return [histogram(df, attribute, clustering, color_map) for attribute in attributes]
 
         self.histogram_figures = histogram_function
 

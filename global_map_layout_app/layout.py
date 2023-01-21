@@ -159,7 +159,7 @@ app.layout = html.Div([
 
             # Button to turn off tourist attractions
             html.Pre("Show tourist attractions:"),
-            html.Button(id="menu-filter-tourist-attractions", n_clicks=0, **{"data-menu-tourist-attractions": "True"})
+            html.Button(id="menu-filter-tourist-attractions", n_clicks=0, **{"data-menu-tourist-attractions": "False"})
         ], id="menu-filter-container"),
 
         # Menu Button container
@@ -169,8 +169,18 @@ app.layout = html.Div([
                 # Contains icons for open and closed. Open gives the three bars and closed gives a cross
                 [html.I(className="open fa-solid fa-bars-staggered fa-2xl"), html.I(className="close fa-solid fa-xmark fa-2xl")],
                 id="menu-button",
+                className="menu-button",
                 n_clicks=0
-                ),   
+            ),   
+
+            # The Button to reset all parameters and data
+            html.Button(
+                # Contains the reset icon
+                html.I(className="reset fa-solid fa-arrow-rotate-right fa-2xl"),
+                id="menu-reset-button",
+                className="menu-button",
+                n_clicks=0
+            )
         ], id="menu-button-container")
     ], id="menu-container", **{"data-menu-toggle": "collapsed"})
 ])
@@ -205,12 +215,16 @@ def filter_data(parameters_filter_dropdown, parameters_filter_rangeslider):
     Output("memory-treemap", "data"),
     Input("treemap-1", "clickData"),
     Input("clustering-key", "value"),
+    Input("menu-reset-button", "n_clicks"),
     Input("treemap-layer-1", "value"),
     Input("treemap-layer-2", "value"),
     Input("treemap-layer-3", "value"),
 )
-def highlight_map(clicked, clustering_key, *args):
+def highlight_map(clicked, clustering_key, reset, *args):
     if clicked is None:
+        return None
+
+    if ctx.triggered[0]["prop_id"].split(".")[0] == "menu-reset-button":
         return None
 
     # Remove selection when color change
@@ -238,9 +252,13 @@ def update_colormap(filtered_dict, clustering_key):
 @app.callback(
     Output("memory-map", "data"),
     Input("memory-map", "data"),
-    Input("map-1", "selectedData")
+    Input("map-1", "selectedData"),
+    Input("menu-reset-button", "n_clicks")
 )
-def highlight_map(prev_selected, selected):
+def highlight_map(prev_selected, selected, reset):
+    if ctx.triggered[0]["prop_id"].split(".")[0] == "menu-reset-button":
+        return None
+
     if selected is None:
         return prev_selected
 
@@ -348,11 +366,12 @@ def update_map(filtered_dict, color_map, treemap_highlight, selected, features, 
 @app.callback(
     filter_rangesliders.histogram_output,
     Input("memory-graphs", "data"),
+    Input("memory-colormap", "data"),
     Input("memory-treemap", "data"),
     Input("memory-map", "data"),
     Input("clustering-key", "value")
 )
-def update_map(filtered_dict, treemap_highlight, selected, clustering = initial_clustering_key):
+def update_map(filtered_dict, color_map, treemap_highlight, selected, clustering = initial_clustering_key):
     filtered = pd.DataFrame.from_records(filtered_dict)
 
     if selected is not None:
@@ -361,7 +380,7 @@ def update_map(filtered_dict, treemap_highlight, selected, clustering = initial_
     if treemap_highlight is not None:
         filtered = filtered.query(treemap_highlight)
 
-    return filter_rangesliders.histogram_figures(filtered, clustering)
+    return filter_rangesliders.histogram_figures(filtered, clustering, color_map)
 
 app.run_server(debug=True)
 
