@@ -39,13 +39,14 @@
     border: none;
     outline: none;
     position: relative;
-    top: 50%;
+    top: 33%;
     border-radius: 5rem;
     box-shadow: 0rem 0rem 5rem rgba(0 0 0 / 35%);
     cursor: pointer;
     transition: transform, background-color;
     transition-timing-function: ease;
     transition-duration: 400ms;
+    z-index: 6;
 }
 
 #menu-button > i{
@@ -61,7 +62,7 @@
 }
 
 #menu-reset-button {
-    background-color: rgb(171, 228, 171);
+    /* background-color: rgb(171, 228, 171); */
 }
 
 #menu-reset-button > i{

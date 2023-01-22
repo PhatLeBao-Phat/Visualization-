@@ -35,12 +35,14 @@ class CustomFigure(FigureManager):
         self.id = type + "-" + unique_name
         self.input = Input(self.id, "selectedData")
         self.output = Output(self.id, "figure")
+        self.information = html.Div(className="information")
         self.html = dcc.Loading(
             id="{}-loading".format(self.id),
             children=[
                 dcc.Graph(
                     id=self.id
-                )
+                ),
+                self.information
             ],
             type="circle"
         )
@@ -63,4 +65,19 @@ class CustomFigure(FigureManager):
 
     def assign_figure(self, figure : callable) -> None:
         self.figure = MethodType(figure, self)
+        pass
+
+    def assign_information(self, information) -> None:
+        self.information = html.Div(information, className="information")
+
+        self.html = dcc.Loading(
+            id="{}-loading".format(self.id),
+            children=[
+                dcc.Graph(
+                    id=self.id
+                ),
+                self.information
+            ],
+            type="circle"
+        )
         pass

@@ -31,6 +31,15 @@ manager = FigureManager()
 map = CustomFigure("map", "1")
 # Assign the figure that generates map
 map.assign_figure(map_figure)
+# Assign information
+map_information = html.Div([
+    html.Pre("Controls of map include:"),
+    html.Li("Selection with 'Box Select'. Top right corner"),
+    html.Li("Hovering over point. Can be any listing"),
+    html.Li("Clicking traces in legend to hide or show traces. Bottom left corner"),
+])
+map.assign_information(map_information)
+
 
 # Adds figure treemap
 treemap = CustomFigure("treemap", "1")
@@ -40,10 +49,31 @@ treemap.assign_figure(treemap_figure)
 treemap.showed = ["neighbourhood_group_cleansed", "room_type", "price_cleansed", "bedrooms"]
 # Generates dropdown (dropdowns are currently hardcoded)
 
+# Assign information
+treemap_information = html.Div([
+    html.Pre("Controls of treemap include:"),
+    html.Li("Change any layer of the treemap via dropdowns"),
+    html.Li("Clicking on any box in any layer"),
+    html.Li("When clicked in, go to the left of the box and just above the box you can select 'All' which is hidden"),
+])
+treemap.assign_information(treemap_information)
+
 # Adds figure PCP
 pcp = CustomFigure("pcp", "1")
 # Assign the figure that generates PCP
 pcp.assign_figure(make_PCP)
+# Assign information
+pcp_information = html.Div([
+    html.Pre("Controls of pcp include:"),
+    html.Li("Add or remove 'parallel coordinates' via multi dropdown"),
+    html.Li("Change the order of the 'parallel coordinate' by dragging the column names"),
+    html.Li("On the parallel coordinates, click and drag down or up to highligh lines"),
+    html.Li("When lines cross, it means negative correlation"),
+    html.Li("When lines are parallel to each other, it means positive correlation"),
+    html.Li("Correlation: mutual connection or linearly related")
+])
+pcp.assign_information(pcp_information)
+
 
 # The general clustering_key for all visualizations (figures)
 initial_clustering_key = "neighbourhood_group_cleansed"
@@ -164,6 +194,15 @@ app.layout = html.Div([
 
         # Menu Button container
         html.Div([
+            # The Button to toggle the information on or off
+            html.Button(
+                # Contains the informatio icon
+                [html.I(className="open fa-solid fa-info fa-2xl"), html.I(className="close fa-solid fa-circle-info fa-2xl")],
+                id="information-button",
+                className="menu-button",
+                n_clicks=0
+            ),
+
             # The Button to toggle the filter menu on or off
             html.Button(
                 # Contains icons for open and closed. Open gives the three bars and closed gives a cross
@@ -183,7 +222,17 @@ app.layout = html.Div([
             )
         ], id="menu-button-container")
     ], id="menu-container", **{"data-menu-toggle": "collapsed"})
-])
+], id="layout", **{"data-information": "hide"})
+
+# Toggle for information overlay
+@app.callback(
+    Output("layout", "data-information"),
+    Input("information-button", "n_clicks"),
+    Input("layout", "data-information"),
+    prevent_initial_call=True
+)
+def update_info(n_clicks, data):
+    return "show" if data == "hide" else "hide"
 
 # Menu
 @app.callback(

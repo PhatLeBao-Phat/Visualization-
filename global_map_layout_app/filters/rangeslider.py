@@ -37,11 +37,13 @@ class RangeSlider(filter.Filter):
             return queries
 
         def histogram(df, attribute, clustering, color_map):
+            # Create rangeslider
             if type(color_map) != list:
+                # If categorical coloring
                 fig = px.histogram(df, x=attribute, color=df[clustering], color_discrete_map=color_map)
             else:
+                # No categorical coloring. No coloring as histogram px does not support continuous coloring
                 fig = px.histogram(df, x=attribute)
-
             
             # legend
             fig.update_layout(showlegend=False)
