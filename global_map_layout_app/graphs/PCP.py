@@ -200,5 +200,4 @@ def make_PCP(self, features, filtered, color_map, color):
         showlegend=True,
         hovermode="x",
     )
-
     return fig

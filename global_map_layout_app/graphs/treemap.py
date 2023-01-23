@@ -48,5 +48,5 @@ def figure(self, filtered_data, clustering_key, color_map, path):
             font_family="Rockwell"
         )
     )
-
+    
     return fig

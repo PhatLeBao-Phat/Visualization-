@@ -78,7 +78,8 @@ pcp_information = html.Div([
     html.Li("On the parallel coordinates, click and drag down or up to highligh lines"),
     html.Li("When lines cross, it means negative correlation"),
     html.Li("When lines are parallel to each other, it means positive correlation"),
-    html.Li("Correlation: mutual connection or linearly related")
+    html.Li("Correlation: mutual connection or linearly related"),
+    html.Li("PCP is effective with less data")
 ])
 pcp.assign_information(pcp_information)
 
@@ -182,7 +183,7 @@ app.layout = html.Div([
             # The name
             html.Pre("Filter Menu", style={"font-size": 30, "text-align": "center"}),
 
-            html.Pre("Clustering key selector"),
+            html.Pre("Clustering key selector. Decides coloring"),
             # Clustering_key dropdown
             dcc.Dropdown(
                 list(df_bnb.columns),
@@ -202,8 +203,8 @@ app.layout = html.Div([
 
             html.Pre("K-means. Select k-means to activate"),
             # K-means slider. Range is 12 long as humans can max. see 12 colors differently at the same time
-            html.Pre("Amount of clusters"),
-            dcc.Slider(1, 13, 1, value = 5, id="slider-k-means"),
+            html.Pre("Number of clusters"),
+            dcc.Slider(1, 6, 1, value = 2, id="slider-k-means"),
 
             # K-means multi dropdown
             html.Pre("Attributes to compute k-means"),
@@ -460,7 +461,7 @@ def update_map(filtered_dict, color_map, treemap_highlight, selected, clustering
 
     return filter_rangesliders.histogram_figures(filtered, clustering, color_map)
 
-app.run_server(debug=True)
+app.run_server(debug=True, dev_tools_ui=False)
 
 
 
