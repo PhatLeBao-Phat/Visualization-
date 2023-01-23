@@ -3,18 +3,27 @@ import plotly.graph_objects as go
 
 
 def figure(self, filtered_data, clustering_key, color_map, tourist_bool = True):
+    # Custom data to include in hover
+    custom_data = ["price_cleansed", "bedrooms", "review_scores_rating", "latitude", "longitude"]
+
     # Create map
     if type(color_map) != list:
         # Coloured on a discrete clustering_key
-        fig = px.scatter_mapbox(filtered_data, lat="latitude", lon="longitude", color=clustering_key, color_discrete_map=color_map, custom_data={})
+        fig = px.scatter_mapbox(filtered_data, lat="latitude", lon="longitude", color=clustering_key, color_discrete_map=color_map, custom_data=custom_data)
     else:
         # Coloured on a sequential clustering_key
-        fig = px.scatter_mapbox(filtered_data, lat="latitude", lon="longitude", color=clustering_key, color_continuous_scale=color_map, custom_data={})
+        fig = px.scatter_mapbox(filtered_data, lat="latitude", lon="longitude", color=clustering_key, color_continuous_scale=color_map, custom_data=custom_data)
 
     # Selected points get highlighted yellow and size of marks are 5
     for scatter in fig.data:
         scatter.marker.size = 5
         scatter.selected = {"marker": {"color": "yellow"}}
+        scatter.hovertemplate = "<br>".join([
+            "Price: %{customdata[0]}",
+            "Bedrooms: %{customdata[1]}",
+            "Review rate: %{customdata[2]}",
+            "Lat: %{customdata[3]}, Long: %{customdata[4]}"
+        ])
 
     # Tourist attractions mapped on the map
     if tourist_bool == True or tourist_bool == "True":

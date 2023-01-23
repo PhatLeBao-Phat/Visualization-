@@ -24,6 +24,12 @@ from graphs.PCP import DIMS, make_PCP
 
 import time
 
+import sklearn.cluster as sk_cluster
+
+# Add k-means to df_bnb columns
+unique_k_means = list(df_bnb.copy().select_dtypes(include="number").drop(["latitude", "longitude"], axis=1).columns)
+df_bnb["k-means"] = 0
+
 # Create manager for the figures. Keeps track of the all the ids, inputs and outputs added
 manager = FigureManager()
 
@@ -35,8 +41,10 @@ map.assign_figure(map_figure)
 map_information = html.Div([
     html.Pre("Controls of map include:"),
     html.Li("Selection with 'Box Select'. Top right corner"),
-    html.Li("Hovering over point. Can be any listing"),
-    html.Li("Clicking traces in legend to hide or show traces. Bottom left corner"),
+    html.Li("Hover over any point on map. Shows price, bedrooms and review rate + lat and long"),
+    html.Li("When the cluster key is not numerical. The value of cluster is shown right of the hover label"),
+    html.Li("Clicking traces in legend to hide or show traces. Bottom left corner"), 
+    html.Li("Clicking the reset button. Resets selection on map"), 
 ])
 map.assign_information(map_information)
 
@@ -46,7 +54,7 @@ treemap = CustomFigure("treemap", "1")
 # Assign the figure that generates treemap
 treemap.assign_figure(treemap_figure)
 # Assign what can be selected as options
-treemap.showed = ["neighbourhood_group_cleansed", "room_type", "price_cleansed", "bedrooms"]
+treemap.showed = ["neighbourhood_group_cleansed", "room_type", "price_cleansed", "bedrooms", "k-means"]
 # Generates dropdown (dropdowns are currently hardcoded)
 
 # Assign information
@@ -174,9 +182,10 @@ app.layout = html.Div([
             # The name
             html.Pre("Filter Menu", style={"font-size": 30, "text-align": "center"}),
 
+            html.Pre("Clustering key selector"),
             # Clustering_key dropdown
             dcc.Dropdown(
-                df_bnb.columns,
+                list(df_bnb.columns),
                 "neighbourhood_group_cleansed",
                 id="clustering-key"
             ),
@@ -189,7 +198,16 @@ app.layout = html.Div([
 
             # Button to turn off tourist attractions
             html.Pre("Show tourist attractions:"),
-            html.Button(id="menu-filter-tourist-attractions", n_clicks=0, **{"data-menu-tourist-attractions": "False"})
+            html.Button(id="menu-filter-tourist-attractions", n_clicks=0, **{"data-menu-tourist-attractions": "False"}),
+
+            html.Pre("K-means. Select k-means to activate"),
+            # K-means slider. Range is 12 long as humans can max. see 12 colors differently at the same time
+            html.Pre("Amount of clusters"),
+            dcc.Slider(1, 13, 1, value = 5, id="slider-k-means"),
+
+            # K-means multi dropdown
+            html.Pre("Attributes to compute k-means"),
+            dcc.Dropdown(unique_k_means, unique_k_means, id="dropdown-k-means", multi=True),
         ], id="menu-filter-container"),
 
         # Menu Button container
@@ -249,13 +267,24 @@ def filter_dropdown(n_clicks, boolean):
     Output("memory-graphs", "data"),
     filter_dropdowns.inputs,
     filter_rangesliders.inputs,
+    Input("slider-k-means", "value"),
+    Input("dropdown-k-means", "value")
 )
-def filter_data(parameters_filter_dropdown, parameters_filter_rangeslider):
+def filter_data(parameters_filter_dropdown, parameters_filter_rangeslider, k_clusters = 3, k_dropdowns = ["bedrooms"]):
     query1 = ' & '.join(filter_dropdowns.conditions_func(list(parameters_filter_dropdown.values())[0]))
     query2 = " & ".join(filter_rangesliders.conditions_func(list(parameters_filter_rangeslider.values())[0]))
     query = " & ".join(["{}".format(query1), "{}".format(query2)])
-
     filtered = df_bnb.query(query)
+
+    # K-means
+    k_means = sk_cluster.KMeans(n_clusters = k_clusters)
+
+    # altered = filtered.copy().select_dtypes(include="number").drop(["latitude", "longitude"], axis=1)
+    altered = filtered[k_dropdowns]
+    altered = altered.fillna(0)
+
+    predicted = k_means.fit_predict(altered)
+    filtered["k-means"] = predicted.astype(str)
 
     return filtered.to_dict('records')
 

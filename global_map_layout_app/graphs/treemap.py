@@ -31,9 +31,9 @@ def figure(self, filtered_data, clustering_key, color_map, path):
         - percentParent: Gives the percentage of listings of based previous later
     """
     fig.data[0].hovertemplate = "<br>".join([
-        "%{customdata[0]}",
-        "%{customdata[1]}",
-        "%{customdata[2]}",
+        "1st layer: %{customdata[0]}",
+        "2nd layer: %{customdata[1]}",
+        "3rd layer: %{customdata[2]}",
         "%{value} or %{percentParent:.1%} of listings",
     ])
 

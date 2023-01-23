@@ -134,9 +134,16 @@ def make_PCP(self, features, filtered, color_map, color):
 
     # Make dummies
     dummify = color
-    dfg = pd.DataFrame({dummify:df_bnb[dummify].unique()})
-    dfg['dummy'] = dfg.index
-    filtered = pd.merge(filtered, dfg, on = dummify, how='left')
+
+    if color == 'k-means':
+        dfg = pd.DataFrame({dummify:filtered[dummify].unique()})
+        dfg['dummy'] = dfg.index
+        filtered = pd.merge(filtered, dfg, on = dummify, how='left')
+    else:
+        dfg = pd.DataFrame({dummify:df_bnb[dummify].unique()})
+        dfg['dummy'] = dfg.index
+        filtered = pd.merge(filtered, dfg, on = dummify, how='left')
+
 
     # If it is a sequential color_map then skip the code underneath
     if type(color_map) != list:
