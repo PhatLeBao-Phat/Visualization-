@@ -26,9 +26,14 @@ import time
 
 import sklearn.cluster as sk_cluster
 
+
 # Add k-means to df_bnb columns
 unique_k_means = list(df_bnb.copy().select_dtypes(include="number").drop(["latitude", "longitude"], axis=1).columns)
 df_bnb["k-means"] = 0
+
+# Unique columns
+columns = list(df_bnb.columns)
+columns.sort()
 
 # Create manager for the figures. Keeps track of the all the ids, inputs and outputs added
 manager = FigureManager()
@@ -186,7 +191,7 @@ app.layout = html.Div([
             html.Pre("Clustering key selector. Decides coloring"),
             # Clustering_key dropdown
             dcc.Dropdown(
-                list(df_bnb.columns),
+                columns,
                 "neighbourhood_group_cleansed",
                 id="clustering-key"
             ),

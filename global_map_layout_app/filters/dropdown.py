@@ -6,6 +6,7 @@ class DropDown(filter.Filter):
         dropdowns = []
         for attribute in attributes:
             unique = data[attribute].dropna().unique()
+            unique.sort()
             if len(list(unique)) < 30:
                 dropdowns.append(html.Div([
                     html.Pre(attribute.split("_")[0][0].capitalize() + attribute.split("_")[0][1:]),
