@@ -4,6 +4,7 @@ from dash import dcc, Input, html
 class DropDown(filter.Filter):
     def __init__(self, data, input_name: str, attributes: list) -> None:
         dropdowns = []
+        attributes.sort()
         for attribute in attributes:
             unique = data[attribute].dropna().unique()
             unique.sort()

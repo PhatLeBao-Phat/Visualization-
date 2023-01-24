@@ -29,6 +29,7 @@ import sklearn.cluster as sk_cluster
 
 # Add k-means to df_bnb columns
 unique_k_means = list(df_bnb.copy().select_dtypes(include="number").drop(["latitude", "longitude"], axis=1).columns)
+unique_k_means.sort()
 df_bnb["k-means"] = 0
 
 # Unique columns

@@ -7,6 +7,7 @@ class RangeSlider(filter.Filter):
         range_sliders = []
         self.histogram_output = []
         self.histogram_lims = {}
+        attributes.sort()
         for index, variable in enumerate(attributes):
             marks = {}
             value = []
