@@ -31,6 +31,11 @@
     font-weight: bold;
 }
 
+#menu-button-container {
+    display: grid;
+    gap: 0 20;
+}
+
 .menu-button {
     width: 5rem;
     height: 5rem;
@@ -59,10 +64,6 @@
     transition: opacity;
     transition-timing-function: ease;
     transition-duration: 400ms;
-}
-
-#menu-reset-button {
-    /* background-color: rgb(171, 228, 171); */
 }
 
 #menu-reset-button > i{

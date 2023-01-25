@@ -1,0 +1,97 @@
+#menu-blindness-button-container {
+    position: relative;
+    height: 100%;
+}
+
+#menu-blindness-button i {
+    color: white;
+}
+
+#menu-blindness-button-container pre {
+    font-weight: bold;
+    text-align: center;
+}
+
+#menu-blindness-button-container > div > button {
+    transform: translateY(-115%)
+}
+
+#menu-blindness-button-container > div > button > i {
+    transform: translateX(40%);
+    color: white;
+}
+
+#menu-blindness-button-container > div {
+    position: fixed;
+    height: 6rem;
+    display: inline-grid;
+    grid-template-columns: auto auto auto auto;
+    grid-template-rows: 5rem auto;
+    transform: translateY(195%);
+    transition: width;
+    transition-timing-function: ease;
+    transition-duration: 400ms;
+}
+
+#menu-blindness-button-container[data-show-coloring="show"] #menu-blindness-button {
+    background-color: rgb(240, 124, 124);
+}
+
+#menu-blindness-button-container[data-show-coloring="hide"] > div {
+    display: none;
+}
+
+#layout[data-color="No Green"] #menu-blindness-button-green {
+    background-color: rgb(240, 124, 124);
+}
+
+#layout[data-color="No Red"] #menu-blindness-button-red {
+    background-color: rgb(240, 124, 124);
+}
+
+#layout[data-color="No Blue"] #menu-blindness-button-blue {
+    background-color: rgb(240, 124, 124);
+}
+
+#layout[data-color="Normal"] #menu-blindness-button-normal {
+    background-color: rgb(240, 124, 124);
+}
+
+#layout[data-color="No Green"] #menu-blindness-button-green > .close {
+    opacity: 1;
+    z-index: 3;
+    transform: translateX(-40%);
+}
+
+
+#layout[data-color="No Red"] #menu-blindness-button-red > .close {
+    opacity: 1;
+    z-index: 3;
+    transform: translateX(-40%);
+}
+
+#layout[data-color="No Blue"] #menu-blindness-button-blue > .close {
+    opacity: 1;
+    z-index: 3;
+    transform: translateX(-40%);
+}
+
+#layout[data-color="Normal"] #menu-blindness-button-normal > .close {
+    opacity: 1;
+    z-index: 3;
+    transform: translateX(-40%);
+}
+
+#layout[data-color="No Green"] #menu-blindness-button-green > .open {
+    opacity: 0;
+}
+#layout[data-color="No Red"] #menu-blindness-button-red > .open {
+    opacity: 0;
+}
+#layout[data-color="No Blue"] #menu-blindness-button-blue > .open {
+    opacity: 0;
+}
+#layout[data-color="Normal"] #menu-blindness-button-normal > .open {
+    opacity: 0;
+}
+

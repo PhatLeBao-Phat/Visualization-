@@ -244,10 +244,59 @@ app.layout = html.Div([
                 id="menu-reset-button",
                 className="menu-button",
                 n_clicks=0
-            )
+            ),
+
+            html.Div([
+                html.Button([
+                    html.I(className="fa-solid fa-arrows-to-eye fa-2xl"),
+                ], id="menu-blindness-button", className="menu-button", n_clicks=0),
+
+                html.Div([
+                    # No Green
+                    html.Button(
+                        # Contains icons for open and closed. Open gives the three bars and closed gives a cross
+                        [html.I(className="open fa-solid fa-eye fa-2xl"), html.I(className="close fa-solid fa-eye-dropper fa-2xl")],
+                        id="menu-blindness-button-green",
+                        className="menu-button coloring",
+                        n_clicks=0,
+                    ),
+
+                    # No Red
+                    html.Button(
+                        # Contains icons for open and closed. Open gives the three bars and closed gives a cross
+                        [html.I(className="open fa-solid fa-eye fa-2xl"), html.I(className="close fa-solid fa-eye-dropper fa-2xl")],
+                        id="menu-blindness-button-red",
+                        className="menu-button coloring",
+                        n_clicks=0,
+                    ),
+
+                    # No Blue
+                    html.Button(
+                        # Contains icons for open and closed. Open gives the three bars and closed gives a cross
+                        [html.I(className="open fa-solid fa-eye fa-2xl"), html.I(className="close fa-solid fa-eye-dropper fa-2xl")],
+                        id="menu-blindness-button-blue",
+                        className="menu-button coloring",
+                        n_clicks=0,
+                    ),
+
+                    # Normal
+                    html.Button(
+                        # Contains icons for open and closed. Open gives the three bars and closed gives a cross
+                        [html.I(className="open fa-solid fa-eye fa-2xl"), html.I(className="close fa-solid fa-eye-dropper fa-2xl")],
+                        id="menu-blindness-button-normal",
+                        className="menu-button coloring",
+                        n_clicks=0,
+                    ),
+
+                    html.Pre("Deuteranopia"),
+                    html.Pre("Protanopia"),
+                    html.Pre("Tritanopia"),
+                    html.Pre("Normal"),
+                ]),
+            ], id="menu-blindness-button-container", **{"data-show-coloring": "hide"}),
         ], id="menu-button-container")
     ], id="menu-container", **{"data-menu-toggle": "collapsed"})
-], id="layout", **{"data-information": "hide"})
+], id="layout", **{"data-information": "hide", "data-color": "Normal"})
 
 # Toggle for information overlay
 @app.callback(
@@ -258,6 +307,35 @@ app.layout = html.Div([
 )
 def update_info(n_clicks, data):
     return "show" if data == "hide" else "hide"
+
+# Hide or Show coloring blindness menu
+@app.callback(
+    Output("menu-blindness-button-container", "data-show-coloring"),
+    Input("menu-blindness-button", "n_clicks"),
+    Input("menu-blindness-button-container", "data-show-coloring"),
+    prevent_initial_call=True
+)
+def update_coloring(n_clicks, data):
+    return "show" if data == "hide" else "hide"
+
+# Color blindness buttons
+@app.callback(
+    Output("layout", "data-color"),
+    Input("menu-blindness-button-green", "n_clicks"),
+    Input("menu-blindness-button-red", "n_clicks"),
+    Input("menu-blindness-button-blue", "n_clicks"),
+    Input("menu-blindness-button-normal", "n_clicks"),
+    prevent_initial_call=True
+)
+def update_blindness(*args):
+    if ctx.triggered[0]["prop_id"].split(".")[0] == "menu-blindness-button-green":
+        return "No Green"
+    if ctx.triggered[0]["prop_id"].split(".")[0] == "menu-blindness-button-red":
+        return "No Red"
+    if ctx.triggered[0]["prop_id"].split(".")[0] == "menu-blindness-button-blue":
+        return "No Blue"
+    if ctx.triggered[0]["prop_id"].split(".")[0] == "menu-blindness-button-normal":
+        return "Normal"
 
 # Menu
 @app.callback(
@@ -327,11 +405,13 @@ def highlight_map(clicked, clustering_key, reset, *args):
 @app.callback(
     Output("memory-colormap", "data"),
     Input("memory-graphs", "data"),
-    Input("clustering-key", "value")
+    Input("clustering-key", "value"),
+    Input("layout", "data-color")
 )
-def update_colormap(filtered_dict, clustering_key):
+def update_colormap(filtered_dict, clustering_key, coloring):
     filtered = pd.DataFrame.from_records(filtered_dict)
-    return color(filtered, clustering_key)
+    print(coloring)
+    return color(filtered, clustering_key, coloring)
 
 # Store the selection on the map
 @app.callback(
