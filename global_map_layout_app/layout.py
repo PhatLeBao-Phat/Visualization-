@@ -547,9 +547,4 @@ def update_map(filtered_dict, color_map, treemap_highlight, selected, clustering
 
     return filter_rangesliders.histogram_figures(filtered, clustering, color_map)
 
-app.run_server(debug=True, dev_tools_ui=False)
-
-
-
-
-
+app.run_server(debug=False, dev_tools_ui=False)

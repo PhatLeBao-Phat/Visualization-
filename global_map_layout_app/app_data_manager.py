@@ -88,4 +88,3 @@ def initialize_data_callbacks(app):
         # data_bool = (data["long"] > right_bottom[0]) & (data["lat"] < right_bottom[1]) & (data["long"] < left_top[0]) & (data["lat"] > left_top[1])
 
         return "((longitude > {}) & (latitude < {}) & (longitude < {}) & (latitude > {}))".format(right_bottom_y, right_bottom_x, left_top_y, left_top_x)
-
