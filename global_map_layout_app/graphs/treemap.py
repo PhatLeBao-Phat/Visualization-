@@ -19,7 +19,7 @@ def figure(self, filtered_data, clustering_key, color_map, path):
         - label: A unique observation of that layer
     """
     fig.data[0].texttemplate = "<br>".join([
-        "%{value} or %{percentParent} of the listings is %{label}",
+        "%{value} or %{percentParent} of the listings of 2nd layer is %{label}",
     ])
 
     """
@@ -34,7 +34,7 @@ def figure(self, filtered_data, clustering_key, color_map, path):
         "1st layer: %{customdata[0]}",
         "2nd layer: %{customdata[1]}",
         "3rd layer: %{customdata[2]}",
-        "%{value} or %{percentParent:.1%} of listings",
+        "%{value} or %{percentRoot:.1%} of all listings",
     ])
 
     # Less white space
