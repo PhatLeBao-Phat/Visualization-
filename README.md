@@ -1,7 +1,7 @@
 # Visualization-
 
 **How to run code**
-- Open source code in visual studio code
+- Open source code or copy HTTPS into visual studio code
 - Find "global_map_layout_app" folder and click it
 - Within, navigate to the layout file and run that
 - When run, Dash will output a local host website. The terminal has the local host link
@@ -9,6 +9,7 @@
 - Make sure your screen is bigger or equal to 1920 x 1080 pixels
 
 Make sure the versions are the same, if you are running into issues.
+See requirements for the specific versions.
 
 **Code from existing code and libraries**
 Every figure used, map, treemap, pcp and histograms, are from the plotly library.
