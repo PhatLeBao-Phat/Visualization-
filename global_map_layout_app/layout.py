@@ -1,23 +1,17 @@
-import plotly.express as px
-import plotly.graph_objects as go
 import pandas as pd
-import numpy as np
 from dash import html, Dash, ctx, dcc
-from dash.dependencies import Input, Output, State
-from typing import Union
-from types import MethodType
-from data.data_helpers import df_bnb
-from graphs.PCP import DIMS, make_PCP
+from dash.dependencies import Input, Output
 import time
 import sklearn.cluster as sk_cluster
 
 from color import color
 from figure import FigureManager, CustomFigure
+from graphs.PCP import DIMS, make_PCP
 from graphs.map import figure as map_figure
 from graphs.treemap import figure as treemap_figure
 from filters.dropdown import DropDown
+from data.data_helpers import df_bnb
 from filters.rangeslider import RangeSlider
-
 
 # Add k-means to df_bnb columns
 unique_k_means = list(df_bnb.copy().select_dtypes(include="number").drop(["latitude", "longitude"], axis=1).columns)
